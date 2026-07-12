@@ -183,7 +183,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
         caption += f"📅 {time_str}\n"
         return caption
     
-    # ----- All other styles (kept fully as in original) -----
+    # ----- All other styles (fully included) -----
     elif style == "minimal_glass":
         return (
             f"\n<b>┌───⧫ 𝐕𝐈𝐃𝐄𝐎 𝐈𝐍𝐅𝐎 ⧫───┐</b>\n"
@@ -473,7 +473,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-# ========================= SETTINGS SYSTEM (fixed) =========================
+# ========================= SETTINGS SYSTEM =========================
 
 def get_user_settings(user_id: int, bot_username: str) -> dict:
     settings = db.get_user_settings(user_id, bot_username)
@@ -801,7 +801,128 @@ async def settings_callback(client: Client, query: CallbackQuery):
 
     await query.answer("Unknown option")
 
-# ========================= SCHEDULED AUTO-UPLOAD =========================
+# ========================= AUTHORIZATION FILTERS (defined early) =========================
+
+def auth_check_filter(_, client, message):
+    try:
+        if message.chat.type == "channel":
+            return db.is_channel_authorized(message.chat.id, client.me.username)
+        else:
+            return db.is_user_authorized(message.from_user.id, client.me.username)
+    except Exception:
+        return False
+
+auth_filter = filters.create(auth_check_filter)
+not_auth_filter = filters.create(lambda _, client, message: not auth_check_filter(_, client, message))
+
+# ========================= START & OTHER COMMANDS =========================
+
+@bot.on_message(filters.command("start") & (filters.private | filters.channel))
+async def start_cmd(bot: Client, m: Message):
+    try:
+        if m.chat.type == "channel":
+            if not db.is_channel_authorized(m.chat.id, bot.me.username):
+                return
+            await m.reply_text(
+                "**✨ Bot is active in this channel**\n\n"
+                "**Available Commands:**\n"
+                "• /drm - Download DRM videos\n"
+                "• /plan - View channel subscription\n\n"
+                "Send these commands in the channel to use them.",
+                parse_mode=ParseMode.HTML
+            )
+        else:
+            is_authorized = db.is_user_authorized(m.from_user.id, bot.me.username)
+            is_admin = db.is_admin(m.from_user.id)
+            if not is_authorized:
+                await m.reply_photo(
+                    photo=photologo,
+                    caption=(
+                        f"<b>⛔ Access Denied</b>\n\n"
+                        f"<blockquote>You don't have permission to use this bot.</blockquote>\n"
+                        f"<i>Contact admin to get access.</i>"
+                    ),
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/Helpbykrishna2_bot")],
+                        [InlineKeyboardButton("ℹ️ Features", callback_data="help")]
+                    ]),
+                    parse_mode=ParseMode.HTML
+                )
+                return
+            
+            commands_list = (
+                "• <b>/drm</b> - Start uploading courses\n"
+                "• <b>/plan</b> - View subscription details\n"
+            )
+            if is_admin:
+                commands_list += "\n<b>👑 Admin:</b>\n• /users - List all users\n"
+            
+            caption = (
+                f"<b>┌───⧫ 𝐖𝐄𝐋𝐂𝐎𝐌𝐄 ⧫───┐</b>\n"
+                f"│\n"
+                f"│  👋 <b>Hello, {m.from_user.first_name}</b>\n"
+                f"│\n"
+                f"│  ✨ <i>қⲅⳕ⳽ⲏⲛⲇ ★⚔ is ready!</i>\n"
+                f"│  📌 Use commands below\n"
+                f"│\n"
+                f"│  <b>📁 Commands:</b>\n"
+                f"{commands_list}\n"
+                f"│\n"
+                f"└───⧫ <b>қⲅⳕ⳽ⲏⲛⲇ ★⚔</b> ⧫───┘"
+            )
+            
+            await m.reply_photo(
+                photo=photologo,
+                caption=caption,
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("📞 Contact", url="https://t.me/Helpbykrishna2_bot")],
+                    [InlineKeyboardButton("ℹ️ Features", callback_data="help"),
+                     InlineKeyboardButton("📊 Plan", callback_data="plan")]
+                ]),
+                parse_mode=ParseMode.HTML
+            )
+    except Exception as e:
+        print(f"Error in start: {str(e)}")
+
+@bot.on_message(not_auth_filter & filters.private & filters.command)
+async def unauthorized_handler(client, message: Message):
+    await message.reply(
+        "<b>Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/DRM_Wizardbot)</b>\n\n"
+        "<blockquote>You need to have an active subscription to use this bot.\n"
+        "Please contact admin to get premium access.</blockquote>",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("💫 Get Premium Access", url="https://t.me/Helpbykrishna2_bot")
+        ]]),
+        parse_mode=ParseMode.HTML
+    )
+
+@bot.on_message(filters.command(["id"]))
+async def id_command(client, message: Message):
+    chat_id = message.chat.id
+    await message.reply_text(f"<blockquote>The ID of this chat id is:</blockquote>\n`{chat_id}`", parse_mode=ParseMode.HTML)
+
+@bot.on_message(filters.command(["t2h"]))
+async def call_html_handler(bot: Client, message: Message):
+    await bot.send_message(message.chat.id, "📂 Please upload a .txt file to convert to HTML. Use /html command.", parse_mode=ParseMode.HTML)
+
+@bot.on_message(filters.command(["logs"]) & auth_filter)
+async def send_logs(client: Client, m: Message):
+    if m.chat.type == "channel":
+        if not db.is_channel_authorized(m.chat.id, client.me.username):
+            return
+    else:
+        if not db.is_user_authorized(m.from_user.id, client.me.username):
+            await m.reply_text("❌ Not authorized.", parse_mode=ParseMode.HTML)
+            return
+    try:
+        with open("logs.txt", "rb") as file:
+            sent = await m.reply_text("**📤 Sending logs...**", parse_mode=ParseMode.HTML)
+            await m.reply_document(document=file)
+            await sent.delete()
+    except Exception as e:
+        await m.reply_text(f"**Error:** {e}", parse_mode=ParseMode.HTML)
+
+# ========================= SCHEDULED AUTO-UPLOAD COMMANDS =========================
 
 @bot.on_message(filters.command("autotime") & filters.private)
 async def set_auto_time(client: Client, message: Message):
@@ -882,7 +1003,6 @@ async def scheduled_upload_checker():
                     links = db.get_auto_data(user_id, bot_username)
                     if links:
                         asyncio.create_task(run_scheduled_upload(user_id, bot_username, links))
-                        # Clear data after triggering (will be done in the task)
                     else:
                         db.clear_auto_data(user_id, bot_username)
         except Exception as e:
@@ -912,16 +1032,101 @@ async def run_scheduled_upload(user_id: int, bot_username: str, links: list):
         for name1, url in links:
             name1 = re.sub(r'[\(\)_\t:/+*#|@.]', '', name1).strip()[:60]
             name = name1[:60]
-            # ---- Full transformation block (copied from original txt_handler) ----
-            # I will paste the exact block from your original code here.
-            # Since this is a long block, I'll include it as a placeholder.
-            # You must copy the entire transformation chain from your original txt_handler.
-            # For now, I'll assume the reader will copy it.
-            # (I'll provide a commented instruction)
-            # ----------------------------------------------------------------
-            # TODO: Copy the full if/elif chain from your original txt_handler here.
-            # For demonstration, I'll use a simple download command:
-            cmd = f'yt-dlp -f "bestvideo[height<={quality}]+bestaudio" "{url}" -o "{name}.mp4"'
+            # ---- Full URL transformation (copied from original) ----
+            if "visionias" in url:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
+                        text = await resp.text()
+                        url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
+
+            if "acecwply" in url:
+                cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={quality}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
+            elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
+                base_with_params, signature = url.split("*")
+                base_clean = base_with_params.split(".mkv")[0] + ".mkv"
+                if "static-trans-v1.classx.co.in" in url:
+                    base_clean = base_clean.replace("https://static-trans-v1.classx.co.in", "https://appx-transcoded-videos-mcdn.akamai.net.in")
+                elif "static-trans-v2.classx.co.in" in url:
+                    base_clean = base_clean.replace("https://static-trans-v2.classx.co.in", "https://transcoded-videos-v2.classx.co.in")
+                url = f"{base_clean}*{signature}"
+            elif "https://static-rec.classx.co.in/drm/" in url:
+                base_with_params, signature = url.split("*")
+                base_clean = base_with_params.split("?")[0]
+                base_clean = base_clean.replace("https://static-rec.classx.co.in", "https://appx-recordings-mcdn.akamai.net.in")
+                url = f"{base_clean}*{signature}"
+            elif "https://static-wsb.classx.co.in/" in url:
+                clean_url = url.split("?")[0]
+                clean_url = clean_url.replace("https://static-wsb.classx.co.in", "https://appx-wsb-gcp-mcdn.akamai.net.in")
+                url = clean_url
+            elif "https://static-db.classx.co.in/" in url:
+                if "*" in url:
+                    base_url, key = url.split("*", 1)
+                    base_url = base_url.split("?")[0]
+                    base_url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+                    url = f"{base_url}*{key}"
+                else:
+                    base_url = url.split("?")[0]
+                    url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+            elif "https://static-db-v2.classx.co.in/" in url:
+                if "*" in url:
+                    base_url, key = url.split("*", 1)
+                    base_url = base_url.split("?")[0]
+                    base_url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+                    url = f"{base_url}*{key}"
+                else:
+                    base_url = url.split("?")[0]
+                    url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+            elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+                url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
+                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+                mpd, keys = helper.get_mps_and_keys(url)
+                url = mpd
+                keys_string = " ".join([f"--key {key}" for key in keys])
+            elif "classplusapp" in url:
+                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+                response = requests.get(signed_api, timeout=40)
+                url = response.json()['url']
+            elif "tencdn.classplusapp" in url:
+                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{pw_token}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+                params = {"url": f"{url}"}
+                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                url = response.json()['url']
+            elif 'videos.classplusapp' in url:
+                url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{pw_token}'}).json()['url']
+            elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url:
+                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{pw_token}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+                params = {"url": f"{url}"}
+                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+                url = response.json()['url']
+            elif "childId" in url and "parentId" in url:
+                url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={pw_token}"
+            if "edge.api.brightcove.com" in url:
+                bcov = f'bcov_auth={cwtoken}'
+                url = url.split("bcov_auth")[0]+bcov
+            elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+                url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={pw_token}"
+            if ".pdf*" in url:
+                url = f"https://dragoapi.vercel.app/pdf/{url}"
+            elif 'encrypted.m' in url:
+                appxkey = url.split('*')[1]
+                url = url.split('*')[0]
+
+            if "youtu" in url:
+                ytf = f"bv*[height<={quality}][ext=mp4]+ba[ext=m4a]/b[height<=?{quality}]"
+            elif "embed" in url:
+                ytf = f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]"
+            else:
+                ytf = f"b[height<={quality}]/bv[height<={quality}]+ba/b/bv+ba"
+
+            if "jw-prod" in url:
+                cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
+            elif "webvideos.classplusapp." in url:
+                cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+            elif "youtube.com" in url or "youtu.be" in url:
+                cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+            else:
+                cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
+
             try:
                 Show = f"<i><b>📥 Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
                 prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
@@ -1022,22 +1227,103 @@ async def txt_handler(bot: Client, m: Message):
     path = f"./downloads/{m.chat.id}"
     os.makedirs(path, exist_ok=True)
 
-    # Process each link (full transformation block copied from original)
-    for idx, (name1, url) in enumerate(links, start=1):
+    for name1, url in links:
         name1 = re.sub(r'[\(\)_\t:/+*#|@.]', '', name1).strip()[:60]
         name = name1[:60]
-        # ---- URL transformations (full original block) ----
-        # (Copy your entire if/elif chain from the original txt_handler here)
-        # I'll include a placeholder; you must replace with your actual transformations.
-        # For demonstration, I'll keep the minimal version.
+        # ---- Full URL transformation (same as scheduled) ----
         if "visionias" in url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
                     text = await resp.text()
                     url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
-        # ... (add all other transformations exactly as in original)
-        # I'll include a generic fallback:
-        cmd = f'yt-dlp -f "bestvideo[height<={quality}]+bestaudio" "{url}" -o "{name}.mp4"'
+
+        if "acecwply" in url:
+            cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={quality}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
+        elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split(".mkv")[0] + ".mkv"
+            if "static-trans-v1.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v1.classx.co.in", "https://appx-transcoded-videos-mcdn.akamai.net.in")
+            elif "static-trans-v2.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v2.classx.co.in", "https://transcoded-videos-v2.classx.co.in")
+            url = f"{base_clean}*{signature}"
+        elif "https://static-rec.classx.co.in/drm/" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split("?")[0]
+            base_clean = base_clean.replace("https://static-rec.classx.co.in", "https://appx-recordings-mcdn.akamai.net.in")
+            url = f"{base_clean}*{signature}"
+        elif "https://static-wsb.classx.co.in/" in url:
+            clean_url = url.split("?")[0]
+            clean_url = clean_url.replace("https://static-wsb.classx.co.in", "https://appx-wsb-gcp-mcdn.akamai.net.in")
+            url = clean_url
+        elif "https://static-db.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+        elif "https://static-db-v2.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+        elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+            url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
+            url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            mpd, keys = helper.get_mps_and_keys(url)
+            url = mpd
+            keys_string = " ".join([f"--key {key}" for key in keys])
+        elif "classplusapp" in url:
+            signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            response = requests.get(signed_api, timeout=40)
+            url = response.json()['url']
+        elif "tencdn.classplusapp" in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{pw_token}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+        elif 'videos.classplusapp' in url:
+            url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{pw_token}'}).json()['url']
+        elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{pw_token}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+        elif "childId" in url and "parentId" in url:
+            url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={pw_token}"
+        if "edge.api.brightcove.com" in url:
+            bcov = f'bcov_auth={cwtoken}'
+            url = url.split("bcov_auth")[0]+bcov
+        elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+            url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={pw_token}"
+        if ".pdf*" in url:
+            url = f"https://dragoapi.vercel.app/pdf/{url}"
+        elif 'encrypted.m' in url:
+            appxkey = url.split('*')[1]
+            url = url.split('*')[0]
+
+        if "youtu" in url:
+            ytf = f"bv*[height<={quality}][ext=mp4]+ba[ext=m4a]/b[height<=?{quality}]"
+        elif "embed" in url:
+            ytf = f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]"
+        else:
+            ytf = f"b[height<={quality}]/bv[height<={quality}]+ba/b/bv+ba"
+
+        if "jw-prod" in url:
+            cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
+        elif "webvideos.classplusapp." in url:
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+        elif "youtube.com" in url or "youtu.be" in url:
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+        else:
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
         try:
             Show = f"<i><b>📥 Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
@@ -1073,12 +1359,64 @@ async def txt_handler(bot: Client, m: Message):
     )
     os.remove(x)
 
-# ========================= OTHER COMMANDS & STARTUP =========================
+# ========================= OTHER HANDLERS (COOKIES, T2T, STOP, ETC.) =========================
 
-# (All your existing handlers: /start, /stop, /logs, /id, etc. go here unchanged)
-# I'm omitting them for brevity but you must keep them in your actual main.py.
+@bot.on_message(filters.command("cookies") & filters.private)
+async def cookies_handler(client: Client, m: Message):
+    await m.reply_text("Please upload the cookies file (.txt).", quote=True, parse_mode=ParseMode.HTML)
+    try:
+        input_message: Message = await client.listen(m.chat.id)
+        if not input_message.document or not input_message.document.file_name.endswith(".txt"):
+            await m.reply_text("Invalid file type.", parse_mode=ParseMode.HTML)
+            return
+        downloaded_path = await input_message.download()
+        with open(downloaded_path, "r") as f:
+            cookies_content = f.read()
+        with open(cookies_file_path, "w") as f:
+            f.write(cookies_content)
+        await input_message.reply_text("✅ Cookies updated.", parse_mode=ParseMode.HTML)
+    except Exception as e:
+        await m.reply_text(f"⚠️ Error: {str(e)}", parse_mode=ParseMode.HTML)
 
-# ========================= BACKGROUND TASK & BOT RUN =========================
+@bot.on_message(filters.command(["t2t"]))
+async def text_to_txt(client, message: Message):
+    user_id = str(message.from_user.id)
+    editable = await message.reply_text("Send text data:", parse_mode=ParseMode.HTML)
+    input_message: Message = await bot.listen(message.chat.id)
+    if not input_message.text:
+        await message.reply_text("Send valid text.", parse_mode=ParseMode.HTML)
+        return
+    text_data = input_message.text.strip()
+    await input_message.delete()
+    await editable.edit("Send file name or /d for default:", parse_mode=ParseMode.HTML)
+    inputn: Message = await bot.listen(message.chat.id)
+    raw_textn = inputn.text
+    await inputn.delete()
+    await editable.delete()
+    if raw_textn == '/d':
+        custom_file_name = 'txt_file'
+    else:
+        custom_file_name = raw_textn
+    txt_file = os.path.join("downloads", f'{custom_file_name}.txt')
+    os.makedirs(os.path.dirname(txt_file), exist_ok=True)
+    with open(txt_file, 'w') as f:
+        f.write(text_data)
+    await message.reply_document(document=txt_file, caption=f"`{custom_file_name}.txt`", parse_mode=ParseMode.HTML)
+    os.remove(txt_file)
+
+@bot.on_message(filters.command("getcookies") & filters.private)
+async def getcookies_handler(client: Client, m: Message):
+    try:
+        await client.send_document(chat_id=m.chat.id, document=cookies_file_path, caption="Here is the cookies file.", parse_mode=ParseMode.HTML)
+    except Exception as e:
+        await m.reply_text(f"⚠️ Error: {str(e)}", parse_mode=ParseMode.HTML)
+
+@bot.on_message(filters.command(["stop"]))
+async def restart_handler(_, m):
+    await m.reply_text("🚦 **STOPPED**", True, parse_mode=ParseMode.HTML)
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+# ========================= RUN BOT =========================
 
 async def main():
     await bot.start()
