@@ -213,6 +213,13 @@ class Database:
             print(f"{Fore.RED}Authorization error for {user_id}: {str(e)}{Style.RESET_ALL}")
             return False
 
+    def is_channel_authorized(self, channel_id: int, bot_username: str = "ugdevbot") -> bool:
+        """
+        Check if a channel is authorized (for channels, we treat as always authorized if not restricted)
+        For simplicity, we return True for any channel – you can add channel‑specific logic later.
+        """
+        return True
+
     def add_user(self, user_id: int, name: str, days: int, 
                 bot_username: str = "ugdevbot") -> tuple[bool, Optional[datetime]]:
         """
@@ -561,6 +568,75 @@ class Database:
         # If no match, return default group if set
         default = self.get_default_group(user_id, bot_username)
         return default
+
+    # ==================== SCHEDULED AUTO-UPLOAD ====================
+    def set_auto_time(self, user_id: int, bot_username: str, time_str: str) -> bool:
+        """Store scheduled time (HH:MM) for a user."""
+        try:
+            self.settings.update_one(
+                {"user_id": user_id, "bot_username": bot_username},
+                {"$set": {"auto_time": time_str}},
+                upsert=True
+            )
+            return True
+        except Exception as e:
+            print(f"Error setting auto time: {e}")
+            return False
+
+    def get_auto_time(self, user_id: int, bot_username: str) -> Optional[str]:
+        """Get scheduled time for a user."""
+        try:
+            doc = self.settings.find_one({"user_id": user_id, "bot_username": bot_username})
+            return doc.get("auto_time") if doc else None
+        except Exception as e:
+            print(f"Error getting auto time: {e}")
+            return None
+
+    def set_auto_data(self, user_id: int, bot_username: str, links: list) -> bool:
+        """Store the list of [name, url] for scheduled upload."""
+        try:
+            self.settings.update_one(
+                {"user_id": user_id, "bot_username": bot_username},
+                {"$set": {"auto_links": links}},
+                upsert=True
+            )
+            return True
+        except Exception as e:
+            print(f"Error setting auto data: {e}")
+            return False
+
+    def get_auto_data(self, user_id: int, bot_username: str) -> Optional[list]:
+        """Retrieve stored links for scheduled upload."""
+        try:
+            doc = self.settings.find_one({"user_id": user_id, "bot_username": bot_username})
+            return doc.get("auto_links") if doc else None
+        except Exception as e:
+            print(f"Error getting auto data: {e}")
+            return None
+
+    def clear_auto_data(self, user_id: int, bot_username: str) -> bool:
+        """Clear scheduled time and data after upload."""
+        try:
+            self.settings.update_one(
+                {"user_id": user_id, "bot_username": bot_username},
+                {"$unset": {"auto_time": "", "auto_links": ""}}
+            )
+            return True
+        except Exception as e:
+            print(f"Error clearing auto data: {e}")
+            return False
+
+    def get_all_scheduled_users(self, bot_username: str) -> List[dict]:
+        """Get all users with a scheduled time for this bot."""
+        try:
+            cursor = self.settings.find(
+                {"bot_username": bot_username, "auto_time": {"$exists": True}},
+                {"user_id": 1, "auto_time": 1, "_id": 0}
+            )
+            return list(cursor)
+        except Exception as e:
+            print(f"Error fetching scheduled users: {e}")
+            return []
 
 # 🔰 Startup Message
 print(f"\n{Fore.CYAN}{'='*50}")
