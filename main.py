@@ -85,7 +85,7 @@ DEFAULT_SETTINGS = {
     "resume": False,
     "downloader_name": "🥀°𓏲кяιѕнηα⋆🌿",
     "show_extension": True,
-    "caption_style": "boxed_style",  # <-- New default
+    "caption_style": "boxed_style",
     "show_title": True,
     "quality": "480",
     "thumbnail": "default",
@@ -96,10 +96,11 @@ DEFAULT_SETTINGS = {
     "pw_token": "your_token_here",
     "proxy": "",
     "sticker_responses": True,
-    "auto_topic": False,  # <-- New setting
+    "auto_topic": False,
+    "default_upload_chat": None,
 }
 
-# Style display names mapping (add boxed_style)
+# Style display names mapping
 STYLE_DISPLAY_NAMES = {
     "default": "📝 Default",
     "minimal_glass": "🔲 Minimal Glass",
@@ -139,7 +140,7 @@ STYLE_DISPLAY_NAMES = {
     "slanted": "📐 Slanted",
     "dotted_box": "◌ Dotted Box",
     "ultra_modern": "🌀 Ultra Modern",
-    "boxed_style": "📦 Boxed Style",  # <-- New
+    "boxed_style": "📦 Boxed Style",
 }
 
 ALL_STYLES = [
@@ -181,7 +182,7 @@ ALL_STYLES = [
     "slanted",
     "dotted_box",
     "ultra_modern",
-    "boxed_style",  # <-- New
+    "boxed_style",
 ]
 
 # Initialize bot
@@ -203,10 +204,8 @@ register_clean_handler(bot)
 def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic="", subject=""):
     """Generate video caption based on selected style"""
     
-    # Remove HTML tags from batch_blockquote for clean display
     plain_batch = re.sub(r'<[^>]+>', '', batch_blockquote).strip()
 
-    # ---------- BRACKET STYLE ----------
     if style == "bracket_style":
         return (
             f"\n[──────────────────────]\n"
@@ -225,15 +224,12 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n📅 {time_str}\n"
         )
     
-    # ---------- BOXED STYLE (NEW) ----------
     elif style == "boxed_style":
-        # Determine ID type
         if ext_actual.lower() in ["pdf", "jpg", "jpeg", "png"]:
             id_icon = "📁 FILE ID"
         else:
             id_icon = "🎥 VIDEO ID"
         
-        # Title with extension and resolution
         if ext_actual.lower() in ["pdf", "jpg", "jpeg", "png"]:
             title = f"{name1} .{ext_actual}"
         else:
@@ -250,7 +246,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"📥 Downloaded by: {CR}"
         )
 
-    # ---------- MINIMAL GLASS ----------
     elif style == "minimal_glass":
         return (
             f"\n<b>┌───⧫ 𝐕𝐈𝐃𝐄𝐎 𝐈𝐍𝐅𝐎 ⧫───┐</b>\n"
@@ -268,7 +263,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"└───⧫ {time_str} ⧫───┘\n"
         )
 
-    # ---------- NEON GLOW ----------
     elif style == "neon_glow":
         return (
             f"\n<b>◤━━━━━━━━━⧫ 𝐕𝐈𝐃𝐄𝐎 ⧫━━━━━━━━━◥</b>\n\n"
@@ -282,7 +276,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>{time_str}</i>\n"
         )
 
-    # ---------- PREMIUM CARD ----------
     elif style == "premium_card":
         return (
             f"\n<b>┏━━━━━━━━━━━━━━━━━━━━━━┓</b>\n"
@@ -302,7 +295,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n<i>{time_str}</i>\n"
         )
 
-    # ---------- DARK FUTURISTIC ----------
     elif style == "dark_futuristic":
         return (
             f"\n<b>╔═══════════════════════╗</b>\n"
@@ -322,7 +314,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>⏱ {time_str}</i>\n"
         )
 
-    # ---------- CLEAN PROFESSIONAL ----------
     elif style == "clean_professional":
         return (
             f"\n<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
@@ -340,7 +331,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>{time_str}</i>\n"
         )
 
-    # ---------- CYBER TERMINAL ----------
     elif style == "cyber_terminal":
         return (
             f"\n<b>┌─[ VIDEO ]───────────────────┐</b>\n"
@@ -358,7 +348,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n<i>⏱ {time_str}</i>\n"
         )
 
-    # ---------- DUAL BORDER ----------
     elif style == "dual_border":
         return (
             f"\n<b>╔══════════════════════════════╗</b>\n"
@@ -379,7 +368,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>🕐 {time_str}</i>\n"
         )
 
-    # ---------- ROUNDED NEON ----------
     elif style == "rounded_neon":
         return (
             f"\n<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
@@ -397,7 +385,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n<i>⏰ {time_str}</i>\n"
         )
 
-    # ---------- INSTAGRAM ----------
     elif style == "instagram":
         return (
             f"\n<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n\n"
@@ -414,7 +401,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n<i>{time_str}</i>\n"
         )
 
-    # ---------- MATRIX ----------
     elif style == "matrix":
         return (
             f"\n<b>┌─────────────────────────┐</b>\n"
@@ -437,7 +423,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n<i>⏱ {time_str}</i>\n"
         )
 
-    # ---------- SPACE GALAXY ----------
     elif style == "space_galaxy":
         return (
             f"\n<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n"
@@ -455,7 +440,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>🕐 {time_str}</i>\n"
         )
 
-    # ---------- MINIMAL DOTS ----------
     elif style == "minimal_dots":
         return (
             f"\n<b>· · · · · · · · · · · · · · ·</b>\n"
@@ -473,7 +457,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"\n<i>{time_str}</i>\n"
         )
 
-    # ---------- CLASSIC BOX ----------
     elif style == "classic_box":
         return (
             f"\n┌──────────────────────┐\n"
@@ -491,7 +474,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- DOUBLE LINE ----------
     elif style == "double_line":
         return (
             f"\n════════════════════════\n"
@@ -509,7 +491,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- ARROW FLOW ----------
     elif style == "arrow_flow":
         return (
             f"\n▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶\n"
@@ -527,7 +508,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- DOT MATRIX ----------
     elif style == "dot_matrix":
         return (
             f"\n· · · · · · · · · · · · · · ·\n"
@@ -545,7 +525,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- STAR BORDER ----------
     elif style == "star_border":
         return (
             f"\n✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧\n"
@@ -563,7 +542,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- CURVED LINES ----------
     elif style == "curved_lines":
         return (
             f"\n╭──────────────────────╮\n"
@@ -581,7 +559,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- THIN LINES ----------
     elif style == "thin_lines":
         return (
             f"\n┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄\n"
@@ -599,7 +576,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- DIAMOND FRAME ----------
     elif style == "diamond_frame":
         return (
             f"\n◇━━━━━━━━━━━━━━━━━━━━━━◇\n"
@@ -617,7 +593,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- MINIMALIST ----------
     elif style == "minimalist":
         return (
             f"\n─────────── VIDEO ───────────\n"
@@ -631,7 +606,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- BOLD BOX ----------
     elif style == "bold_box":
         return (
             f"\n▛▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▜\n"
@@ -647,7 +621,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- LIGHT SHADOW ----------
     elif style == "light_shadow":
         return (
             f"\n╭──────────────────────╮\n"
@@ -663,7 +636,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- HEXAGON ----------
     elif style == "hexagon":
         return (
             f"\n⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡⟡\n"
@@ -681,7 +653,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- SPLIT LINE ----------
     elif style == "split_line":
         return (
             f"\n─────── ✦ VIDEO ✦ ───────\n"
@@ -695,7 +666,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- SQUARE FRAME ----------
     elif style == "square_frame":
         return (
             f"\n┌──────────────────────┐\n"
@@ -711,7 +681,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- ZIGZAG ----------
     elif style == "zigzag":
         return (
             f"\n╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲\n"
@@ -729,7 +698,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- CLEAN TAB ----------
     elif style == "clean_tab":
         return (
             f"\n▍ VIDEO\n"
@@ -743,7 +711,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- SLANTED ----------
     elif style == "slanted":
         return (
             f"\n╔══════════════════════╗\n"
@@ -759,7 +726,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- DOTTED BOX ----------
     elif style == "dotted_box":
         return (
             f"\n┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐\n"
@@ -777,7 +743,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ---------- ULTRA MODERN ----------
     elif style == "ultra_modern":
         return (
             f"\n▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\n"
@@ -793,7 +758,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"{time_str}\n"
         )
 
-    # ========== DEFAULT (fallback) ==========
     else:
         return (
             f"\n<b>🧭 Index ID:</b> {str(count).zfill(3)}\n\n"
@@ -831,7 +795,6 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton(f"Downloader Name: {settings['downloader_name'][:10]}", callback_data="set_downloader_name")])
     buttons.append([InlineKeyboardButton(f"Show Extension {status('show_extension')}", callback_data="set_show_extension_toggle")])
     
-    # Caption Style with display name
     current_style = settings.get('caption_style', 'boxed_style')
     display_name = STYLE_DISPLAY_NAMES.get(current_style, current_style)
     buttons.append([InlineKeyboardButton(f"🎨 Caption Style: {display_name}", callback_data="set_caption_style")])
@@ -847,7 +810,8 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton("📂 Manage Subject Groups", callback_data="set_subject_groups")])
     buttons.append([InlineKeyboardButton("Manage Database", callback_data="set_db_info")])
     buttons.append([InlineKeyboardButton(f"Sticker Responses {status('sticker_responses')}", callback_data="set_sticker_responses_toggle")])
-    buttons.append([InlineKeyboardButton(f"Auto Topic {status('auto_topic')}", callback_data="set_auto_topic_toggle")])  # <-- NEW
+    buttons.append([InlineKeyboardButton(f"Auto Topic {status('auto_topic')}", callback_data="set_auto_topic_toggle")])
+    buttons.append([InlineKeyboardButton("📌 Set Default Upload Chat", callback_data="set_default_chat")])
     buttons.append([InlineKeyboardButton("🔙 Back to Main Menu", callback_data="main_menu")])
     return InlineKeyboardMarkup(buttons)
 
@@ -861,273 +825,296 @@ async def settings_cmd(client: Client, message: Message):
 
 @bot.on_callback_query()
 async def settings_callback(client: Client, query: CallbackQuery):
-    data = query.data
-    user_id = query.from_user.id
-    bot_username = client.me.username
-    settings = get_user_settings(user_id, bot_username)
+    try:
+        data = query.data
+        user_id = query.from_user.id
+        bot_username = client.me.username
+        settings = get_user_settings(user_id, bot_username)
 
-    if data.endswith("_toggle"):
-        key = data.replace("set_", "").replace("_toggle", "")
-        current = settings.get(key, False)
-        update_setting(user_id, key, not current, bot_username)
-        await query.answer(f"✅ {key.replace('_',' ').title()} set to {not current}")
-        await query.message.edit_text(
-            "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-            reply_markup=settings_menu_markup(user_id)
-        )
-        return
-
-    if data == "set_downloader_name":
-        await query.answer()
-        msg = await query.message.reply_text("✏️ Send the new name (or /cancel):")
-        try:
-            input_msg: Message = await client.listen(msg.chat.id, timeout=30)
-            if input_msg.text and input_msg.text != "/cancel":
-                update_setting(user_id, "downloader_name", input_msg.text.strip(), bot_username)
-                await input_msg.delete()
-                await msg.edit_text("✅ Downloader name updated!")
-                await query.message.edit_text(
-                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
-                )
-            else:
-                await msg.edit_text("❌ Cancelled.")
-        except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
-        return
-
-    if data == "set_caption_style":
-        buttons = []
-        for style in ALL_STYLES:
-            check = " ✅" if settings.get("caption_style") == style else ""
-            display_name = STYLE_DISPLAY_NAMES.get(style, style)
-            buttons.append([InlineKeyboardButton(f"{display_name}{check}", callback_data=f"set_caption_style_{style}")])
-        buttons.append([InlineKeyboardButton("🔙 Back", callback_data="main_menu")])
-        await query.message.edit_text(
-            "🎨 **Select Caption Style:**\n\n"
-            "<i>Choose how video captions should look.</i>",
-            reply_markup=InlineKeyboardMarkup(buttons)
-        )
-        return
-
-    if data.startswith("set_caption_style_"):
-        style = data.replace("set_caption_style_", "")
-        if style in ALL_STYLES:
-            update_setting(user_id, "caption_style", style, bot_username)
-            display_name = STYLE_DISPLAY_NAMES.get(style, style)
-            await query.answer(f"✅ Caption style set to {display_name}")
+        if data.endswith("_toggle"):
+            key = data.replace("set_", "").replace("_toggle", "")
+            current = settings.get(key, False)
+            update_setting(user_id, key, not current, bot_username)
+            await query.answer(f"✅ {key.replace('_',' ').title()} set to {not current}")
             await query.message.edit_text(
                 "⚙️ **Settings Menu**\n\nChoose an option to modify:",
                 reply_markup=settings_menu_markup(user_id)
             )
-        return
-
-    if data == "set_quality":
-        qualities = ["144", "240", "360", "480", "720", "1080"]
-        buttons = []
-        for q in qualities:
-            check = " ✅" if settings.get("quality") == q else ""
-            buttons.append([InlineKeyboardButton(f"{q}p{check}", callback_data=f"set_quality_{q}")])
-        buttons.append([InlineKeyboardButton("🔙 Back", callback_data="main_menu")])
-        await query.message.edit_text(
-            "📐 **Select Upload Quality:**",
-            reply_markup=InlineKeyboardMarkup(buttons)
-        )
-        return
-
-    if data.startswith("set_quality_"):
-        q = data.replace("set_quality_", "")
-        qualities = ["144", "240", "360", "480", "720", "1080"]
-        if q in qualities:
-            update_setting(user_id, "quality", q, bot_username)
-            await query.answer(f"Quality set to {q}p")
-            await query.message.edit_text(
-                "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                reply_markup=settings_menu_markup(user_id)
-            )
-        return
-
-    if data == "set_thumbnail":
-        await query.answer()
-        msg = await query.message.reply_text("🖼️ Send a photo, /default, or /cancel:")
-        try:
-            input_msg: Message = await client.listen(msg.chat.id, timeout=30)
-            if input_msg.photo:
-                file_path = f"downloads/thumb_{user_id}.jpg"
-                await client.download_media(input_msg.photo, file_name=file_path)
-                update_setting(user_id, "thumbnail", file_path, bot_username)
-                await msg.edit_text("✅ Thumbnail updated!")
-                await query.message.edit_text(
-                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
-                )
-            elif input_msg.text == "/default":
-                update_setting(user_id, "thumbnail", "default", bot_username)
-                await msg.edit_text("✅ Reset to default.")
-                await query.message.edit_text(
-                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
-                )
-            elif input_msg.text == "/cancel":
-                await msg.edit_text("❌ Cancelled.")
-            else:
-                await msg.edit_text("❌ Invalid input.")
-        except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
-        return
-
-    if data == "set_pw_token":
-        await query.answer()
-        msg = await query.message.reply_text("🔑 Send new PW token (or /cancel):")
-        try:
-            input_msg: Message = await client.listen(msg.chat.id, timeout=30)
-            if input_msg.text and input_msg.text != "/cancel":
-                update_setting(user_id, "pw_token", input_msg.text.strip(), bot_username)
-                await msg.edit_text("✅ PW Token updated!")
-                await query.message.edit_text(
-                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
-                )
-            else:
-                await msg.edit_text("❌ Cancelled.")
-        except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
-        return
-
-    if data == "set_proxy":
-        await query.answer()
-        msg = await query.message.reply_text("🌐 Send proxy URL (or /cancel):")
-        try:
-            input_msg: Message = await client.listen(msg.chat.id, timeout=30)
-            if input_msg.text and input_msg.text != "/cancel":
-                update_setting(user_id, "proxy", input_msg.text.strip(), bot_username)
-                await msg.edit_text("✅ Proxy updated!")
-                await query.message.edit_text(
-                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
-                )
-            else:
-                await msg.edit_text("❌ Cancelled.")
-        except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
-        return
-
-    if data == "set_db_info":
-        try:
-            status = "✅ Connected" if db.client is not None else "❌ Disconnected"
-            await query.answer(f"Database: {status}")
-            await query.message.reply_text(f"📊 **Database Status**\n\nStatus: {status}\nDatabase: {DATABASE_NAME}")
-        except Exception as e:
-            await query.message.reply_text(f"❌ DB Error: {str(e)}")
-        return
-
-    # ========== SUBJECT GROUP MANAGEMENT ==========
-    if data == "set_subject_groups":
-        groups = db.get_subject_groups(user_id, bot_username)
-        text = "📂 **Subject Groups**\n\n"
-        if groups:
-            for subject, chat_id in groups.items():
-                text += f"• {subject} → `{chat_id}`\n"
-        else:
-            text += "No groups configured.\n"
-        text += f"\nDefault Group: `{db.get_default_group(user_id, bot_username) or 'Not set'}`\n\n"
-        text += "Use buttons below."
-        buttons = [
-            [InlineKeyboardButton("➕ Add New Group", callback_data="add_subject_group")],
-            [InlineKeyboardButton("🗑️ Remove Group", callback_data="remove_subject_group")],
-            [InlineKeyboardButton("📌 Set Default Group", callback_data="set_default_group")],
-            [InlineKeyboardButton("🔙 Back", callback_data="main_menu")]
-        ]
-        await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(buttons))
-        return
-
-    if data == "add_subject_group":
-        await query.answer()
-        msg = await query.message.reply_text("✏️ Send **Subject Name** (e.g., 'Mathematics'):")
-        try:
-            input1: Message = await client.listen(msg.chat.id, timeout=30)
-            if not input1.text or input1.text == "/cancel":
-                await msg.edit_text("❌ Cancelled.")
-                return
-            subject = input1.text.strip()
-            await input1.delete()
-            await msg.edit_text(f"📤 Now send the **Chat ID** (or forward a message):")
-            input2: Message = await client.listen(msg.chat.id, timeout=30)
-            if input2.forward_from_chat:
-                chat_id = input2.forward_from_chat.id
-            elif input2.text and input2.text.lstrip('-').isdigit():
-                chat_id = int(input2.text.strip())
-            else:
-                await msg.edit_text("❌ Invalid chat ID.")
-                return
-            if db.add_subject_group(user_id, bot_username, subject, chat_id):
-                await msg.edit_text(f"✅ Added: {subject} → `{chat_id}`")
-            else:
-                await msg.edit_text("❌ Failed.")
-            await query.message.edit_text(
-                "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                reply_markup=settings_menu_markup(user_id)
-            )
-        except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
-        return
-
-    if data == "remove_subject_group":
-        groups = db.get_subject_groups(user_id, bot_username)
-        if not groups:
-            await query.answer("No groups.")
             return
-        buttons = []
-        for subject in groups.keys():
-            buttons.append([InlineKeyboardButton(f"🗑️ {subject}", callback_data=f"remove_group_{subject}")])
-        buttons.append([InlineKeyboardButton("🔙 Back", callback_data="set_subject_groups")])
-        await query.message.edit_text("Select subject to remove:", reply_markup=InlineKeyboardMarkup(buttons))
-        return
 
-    if data.startswith("remove_group_"):
-        subject = data.replace("remove_group_", "")
-        if db.remove_subject_group(user_id, bot_username, subject):
-            await query.answer(f"Removed {subject}")
-        else:
-            await query.answer("Failed.")
-        await query.message.edit_text(
-            "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-            reply_markup=settings_menu_markup(user_id)
-        )
-        return
+        if data == "set_downloader_name":
+            await query.answer()
+            msg = await query.message.reply_text("✏️ Send the new name (or /cancel):")
+            try:
+                input_msg: Message = await client.listen(msg.chat.id, timeout=30)
+                if input_msg.text and input_msg.text != "/cancel":
+                    update_setting(user_id, "downloader_name", input_msg.text.strip(), bot_username)
+                    await input_msg.delete()
+                    await msg.edit_text("✅ Downloader name updated!")
+                    await query.message.edit_text(
+                        "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                        reply_markup=settings_menu_markup(user_id)
+                    )
+                else:
+                    await msg.edit_text("❌ Cancelled.")
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
 
-    if data == "set_default_group":
-        await query.answer()
-        msg = await query.message.reply_text("📌 Send Chat ID (or forward):")
-        try:
-            input_msg: Message = await client.listen(msg.chat.id, timeout=30)
-            if input_msg.forward_from_chat:
-                chat_id = input_msg.forward_from_chat.id
-            elif input_msg.text and input_msg.text.lstrip('-').isdigit():
-                chat_id = int(input_msg.text.strip())
+        if data == "set_caption_style":
+            buttons = []
+            for style in ALL_STYLES:
+                check = " ✅" if settings.get("caption_style") == style else ""
+                display_name = STYLE_DISPLAY_NAMES.get(style, style)
+                buttons.append([InlineKeyboardButton(f"{display_name}{check}", callback_data=f"set_caption_style_{style}")])
+            buttons.append([InlineKeyboardButton("🔙 Back", callback_data="main_menu")])
+            await query.message.edit_text(
+                "🎨 **Select Caption Style:**\n\n"
+                "<i>Choose how video captions should look.</i>",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        if data.startswith("set_caption_style_"):
+            style = data.replace("set_caption_style_", "")
+            if style in ALL_STYLES:
+                update_setting(user_id, "caption_style", style, bot_username)
+                display_name = STYLE_DISPLAY_NAMES.get(style, style)
+                await query.answer(f"✅ Caption style set to {display_name}")
+                await query.message.edit_text(
+                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                    reply_markup=settings_menu_markup(user_id)
+                )
+            return
+
+        if data == "set_quality":
+            qualities = ["144", "240", "360", "480", "720", "1080"]
+            buttons = []
+            for q in qualities:
+                check = " ✅" if settings.get("quality") == q else ""
+                buttons.append([InlineKeyboardButton(f"{q}p{check}", callback_data=f"set_quality_{q}")])
+            buttons.append([InlineKeyboardButton("🔙 Back", callback_data="main_menu")])
+            await query.message.edit_text(
+                "📐 **Select Upload Quality:**",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        if data.startswith("set_quality_"):
+            q = data.replace("set_quality_", "")
+            qualities = ["144", "240", "360", "480", "720", "1080"]
+            if q in qualities:
+                update_setting(user_id, "quality", q, bot_username)
+                await query.answer(f"Quality set to {q}p")
+                await query.message.edit_text(
+                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                    reply_markup=settings_menu_markup(user_id)
+                )
+            return
+
+        if data == "set_thumbnail":
+            await query.answer()
+            msg = await query.message.reply_text("🖼️ Send a photo, /default, or /cancel:")
+            try:
+                input_msg: Message = await client.listen(msg.chat.id, timeout=30)
+                if input_msg.photo:
+                    file_path = f"downloads/thumb_{user_id}.jpg"
+                    await client.download_media(input_msg.photo, file_name=file_path)
+                    update_setting(user_id, "thumbnail", file_path, bot_username)
+                    await msg.edit_text("✅ Thumbnail updated!")
+                    await query.message.edit_text(
+                        "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                        reply_markup=settings_menu_markup(user_id)
+                    )
+                elif input_msg.text == "/default":
+                    update_setting(user_id, "thumbnail", "default", bot_username)
+                    await msg.edit_text("✅ Reset to default.")
+                    await query.message.edit_text(
+                        "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                        reply_markup=settings_menu_markup(user_id)
+                    )
+                elif input_msg.text == "/cancel":
+                    await msg.edit_text("❌ Cancelled.")
+                else:
+                    await msg.edit_text("❌ Invalid input.")
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
+
+        if data == "set_pw_token":
+            await query.answer()
+            msg = await query.message.reply_text("🔑 Send new PW token (or /cancel):")
+            try:
+                input_msg: Message = await client.listen(msg.chat.id, timeout=30)
+                if input_msg.text and input_msg.text != "/cancel":
+                    update_setting(user_id, "pw_token", input_msg.text.strip(), bot_username)
+                    await msg.edit_text("✅ PW Token updated!")
+                    await query.message.edit_text(
+                        "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                        reply_markup=settings_menu_markup(user_id)
+                    )
+                else:
+                    await msg.edit_text("❌ Cancelled.")
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
+
+        if data == "set_proxy":
+            await query.answer()
+            msg = await query.message.reply_text("🌐 Send proxy URL (or /cancel):")
+            try:
+                input_msg: Message = await client.listen(msg.chat.id, timeout=30)
+                if input_msg.text and input_msg.text != "/cancel":
+                    update_setting(user_id, "proxy", input_msg.text.strip(), bot_username)
+                    await msg.edit_text("✅ Proxy updated!")
+                    await query.message.edit_text(
+                        "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                        reply_markup=settings_menu_markup(user_id)
+                    )
+                else:
+                    await msg.edit_text("❌ Cancelled.")
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
+
+        if data == "set_db_info":
+            try:
+                status = "✅ Connected" if db.client is not None else "❌ Disconnected"
+                await query.answer(f"Database: {status}")
+                await query.message.reply_text(f"📊 **Database Status**\n\nStatus: {status}\nDatabase: {DATABASE_NAME}")
+            except Exception as e:
+                await query.message.reply_text(f"❌ DB Error: {str(e)}")
+            return
+
+        # ========== SUBJECT GROUP MANAGEMENT ==========
+        if data == "set_subject_groups":
+            groups = db.get_subject_groups(user_id, bot_username)
+            text = "📂 **Subject Groups**\n\n"
+            if groups:
+                for subject, chat_id in groups.items():
+                    text += f"• {subject} → `{chat_id}`\n"
             else:
-                await msg.edit_text("❌ Invalid.")
+                text += "No groups configured.\n"
+            text += f"\nDefault Group: `{db.get_default_group(user_id, bot_username) or 'Not set'}`\n\n"
+            text += "Use buttons below."
+            buttons = [
+                [InlineKeyboardButton("➕ Add New Group", callback_data="add_subject_group")],
+                [InlineKeyboardButton("🗑️ Remove Group", callback_data="remove_subject_group")],
+                [InlineKeyboardButton("📌 Set Default Group", callback_data="set_default_group")],
+                [InlineKeyboardButton("🔙 Back", callback_data="main_menu")]
+            ]
+            await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(buttons))
+            return
+
+        if data == "add_subject_group":
+            await query.answer()
+            msg = await query.message.reply_text("✏️ Send **Subject Name** (e.g., 'Mathematics'):")
+            try:
+                input1: Message = await client.listen(msg.chat.id, timeout=30)
+                if not input1.text or input1.text == "/cancel":
+                    await msg.edit_text("❌ Cancelled.")
+                    return
+                subject = input1.text.strip()
+                await input1.delete()
+                await msg.edit_text(f"📤 Now send the **Chat ID** (or forward a message):")
+                input2: Message = await client.listen(msg.chat.id, timeout=30)
+                if input2.forward_from_chat:
+                    chat_id = input2.forward_from_chat.id
+                elif input2.text and input2.text.lstrip('-').isdigit():
+                    chat_id = int(input2.text.strip())
+                else:
+                    await msg.edit_text("❌ Invalid chat ID.")
+                    return
+                if db.add_subject_group(user_id, bot_username, subject, chat_id):
+                    await msg.edit_text(f"✅ Added: {subject} → `{chat_id}`")
+                else:
+                    await msg.edit_text("❌ Failed.")
+                await query.message.edit_text(
+                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                    reply_markup=settings_menu_markup(user_id)
+                )
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
+
+        if data == "remove_subject_group":
+            groups = db.get_subject_groups(user_id, bot_username)
+            if not groups:
+                await query.answer("No groups.")
                 return
-            if db.set_default_group(user_id, bot_username, chat_id):
-                await msg.edit_text(f"✅ Default group set to `{chat_id}`")
+            buttons = []
+            for subject in groups.keys():
+                buttons.append([InlineKeyboardButton(f"🗑️ {subject}", callback_data=f"remove_group_{subject}")])
+            buttons.append([InlineKeyboardButton("🔙 Back", callback_data="set_subject_groups")])
+            await query.message.edit_text("Select subject to remove:", reply_markup=InlineKeyboardMarkup(buttons))
+            return
+
+        if data.startswith("remove_group_"):
+            subject = data.replace("remove_group_", "")
+            if db.remove_subject_group(user_id, bot_username, subject):
+                await query.answer(f"Removed {subject}")
             else:
-                await msg.edit_text("❌ Failed.")
+                await query.answer("Failed.")
             await query.message.edit_text(
                 "⚙️ **Settings Menu**\n\nChoose an option to modify:",
                 reply_markup=settings_menu_markup(user_id)
             )
-        except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
-        return
+            return
 
-    if data == "main_menu":
-        await query.message.edit_text(
-            "⚙️ **Settings Menu**\n\nChoose an option:",
-            reply_markup=settings_menu_markup(user_id)
-        )
-        return
+        if data == "set_default_group":
+            await query.answer()
+            msg = await query.message.reply_text("📌 Send Chat ID (or forward):")
+            try:
+                input_msg: Message = await client.listen(msg.chat.id, timeout=30)
+                if input_msg.forward_from_chat:
+                    chat_id = input_msg.forward_from_chat.id
+                elif input_msg.text and input_msg.text.lstrip('-').isdigit():
+                    chat_id = int(input_msg.text.strip())
+                else:
+                    await msg.edit_text("❌ Invalid.")
+                    return
+                if db.set_default_group(user_id, bot_username, chat_id):
+                    await msg.edit_text(f"✅ Default group set to `{chat_id}`")
+                else:
+                    await msg.edit_text("❌ Failed.")
+                await query.message.edit_text(
+                    "⚙️ **Settings Menu**\n\nChoose an option to modify:",
+                    reply_markup=settings_menu_markup(user_id)
+                )
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
 
-    await query.answer("Unknown option")
+        if data == "set_default_chat":
+            await query.answer()
+            msg = await query.message.reply_text("📌 Send the chat ID (or /cancel):")
+            try:
+                input_msg: Message = await client.listen(msg.chat.id, timeout=30)
+                if input_msg.text and input_msg.text != "/cancel":
+                    try:
+                        chat_id = int(input_msg.text.strip())
+                        update_setting(user_id, "default_upload_chat", chat_id, bot_username)
+                        await msg.edit_text(f"✅ Default upload chat set to `{chat_id}`")
+                    except ValueError:
+                        await msg.edit_text("❌ Invalid chat ID.")
+                else:
+                    await msg.edit_text("❌ Cancelled.")
+            except asyncio.TimeoutError:
+                await msg.edit_text("⏰ Timeout.")
+            return
+
+        if data == "main_menu":
+            await query.message.edit_text(
+                "⚙️ **Settings Menu**\n\nChoose an option:",
+                reply_markup=settings_menu_markup(user_id)
+            )
+            return
+
+        await query.answer("Unknown option")
+
+    except Exception as e:
+        await query.answer(f"Error: {str(e)}")
+        await query.message.reply_text(f"❌ Error: {str(e)}")
 
 # ========================= END SETTINGS SYSTEM =========================
 
@@ -1365,11 +1352,10 @@ async def send_logs(client: Client, m: Message):
 # ========================= MAIN DRM HANDLER (BATCH) =========================
 @bot.on_message(filters.command(["drm"]) & auth_filter)
 async def txt_handler(bot: Client, m: Message):
-    # Get bot username
+    # ===== AUTHORIZATION =====
     bot_info = await bot.get_me()
     bot_username = bot_info.username
 
-    # Check authorization
     if m.chat.type == "channel":
         if not db.is_channel_authorized(m.chat.id, bot_username):
             return
@@ -1398,22 +1384,31 @@ async def txt_handler(bot: Client, m: Message):
     file_name, ext = os.path.splitext(os.path.basename(x))
     path = f"./downloads/{m.chat.id}"
 
-    # Counters
+    # ===== PARSE FILE AND GROUP BY FOLDER =====
+    folders = {}
+    all_links_count = 0
     pdf_count = img_count = v2_count = mpd_count = m3u8_count = yt_count = drm_count = zip_count = other_count = 0
 
     try:
         with open(x, "r", encoding='utf-8') as f:
             content = f.read()
-        content = content.split("\n")
-        content = [line.strip() for line in content if line.strip()]
-        links = []
-        for i in content:
-            if "://" in i:
-                parts = i.split("://", 1)
+        lines = [line.strip() for line in content.split("\n") if line.strip()]
+        for line in lines:
+            if "://" in line:
+                parts = line.split("://", 1)
                 if len(parts) == 2:
-                    name = parts[0]
-                    url = parts[1]
-                    links.append([name, url])
+                    name = parts[0].strip()
+                    url = "https://" + parts[1].strip() if not parts[1].startswith("http") else parts[1].strip()
+                    # Detect folder
+                    if "/" in name or "\\" in name:
+                        separator = "/" if "/" in name else "\\"
+                        folder, title = name.split(separator, 1)
+                    else:
+                        folder = "General"
+                        title = name
+                    folders.setdefault(folder, []).append((title, url))
+                    all_links_count += 1
+                    # Count types
                     if ".pdf" in url: pdf_count += 1
                     elif url.endswith((".png", ".jpeg", ".jpg")): img_count += 1
                     elif "v2" in url: v2_count += 1
@@ -1428,13 +1423,21 @@ async def txt_handler(bot: Client, m: Message):
         os.remove(x)
         return
 
+    if not folders:
+        await m.reply_text("No valid links found.")
+        os.remove(x)
+        return
+
+    # Display folder summary
+    folder_summary = "\n".join([f"📂 {f}: {len(links)} items" for f, links in folders.items()])
     await editable.edit(
-        f"**Total links: {len(links)}**\n"
+        f"**📂 Folders found:**\n{folder_summary}\n\n"
+        f"**Total links: {all_links_count}**\n"
         f"PDF: {pdf_count}   IMG: {img_count}   V2: {v2_count}\n"
         f"ZIP: {zip_count}   DRM: {drm_count}   M3U8: {m3u8_count}\n"
         f"MPD: {mpd_count}   YT: {yt_count}\n"
         f"Others: {other_count}\n\n"
-        f"Send Index ID between 1-{len(links)}:"
+        f"Send Index ID between 1-{all_links_count}:"
     )
 
     chat_id = editable.chat.id
@@ -1446,11 +1449,12 @@ async def txt_handler(bot: Client, m: Message):
     except asyncio.TimeoutError:
         raw_text = '1'
 
-    if int(raw_text) > len(links):
-        await editable.edit(f"Enter number in range 1-{len(links)}")
+    start_index = int(raw_text) - 1
+    if start_index < 0 or start_index >= all_links_count:
+        await editable.edit(f"Enter number in range 1-{all_links_count}")
         return
 
-    # Batch Name
+    # ===== ASK FOR BATCH INFO =====
     await editable.edit("1. Enter Batch Name\n2. Send /d for default")
     try:
         input1: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1460,7 +1464,6 @@ async def txt_handler(bot: Client, m: Message):
         raw_text0 = '/d'
     b_name = file_name.replace('_', ' ') if raw_text0 == '/d' else raw_text0
 
-    # 🔥 NEW: Topic Name
     await editable.edit("Enter Topic Name (or /d for default):")
     try:
         input_topic: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1470,7 +1473,6 @@ async def txt_handler(bot: Client, m: Message):
         raw_topic = '/d'
     topic = "General" if raw_topic == '/d' else raw_topic
 
-    # 🔥 NEW: Subject Name
     await editable.edit("Enter Subject Name (or /d for default):")
     try:
         input_subject: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1480,7 +1482,6 @@ async def txt_handler(bot: Client, m: Message):
         raw_subject = '/d'
     subject = "General" if raw_subject == '/d' else raw_subject
 
-    # Resolution
     await editable.edit("Enter resolution:\n144/240/360/480/720/1080")
     try:
         input2: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1494,7 +1495,6 @@ async def txt_handler(bot: Client, m: Message):
     except:
         res = "UN"
 
-    # Watermark
     await editable.edit("Send watermark text or /d for none")
     try:
         inputx: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1505,7 +1505,6 @@ async def txt_handler(bot: Client, m: Message):
     global watermark
     watermark = "/d" if raw_textx == '/d' else raw_textx
 
-    # Credit
     await editable.edit("Send credit name or /d for default")
     try:
         input3: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1520,7 +1519,6 @@ async def txt_handler(bot: Client, m: Message):
     else:
         CR = raw_text3
 
-    # PW Token
     await editable.edit("Send PW token or /d")
     try:
         input4: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1529,7 +1527,6 @@ async def txt_handler(bot: Client, m: Message):
     except asyncio.TimeoutError:
         raw_text4 = '/d'
 
-    # Thumbnail
     await editable.edit("Send photo for thumbnail, /d for default, /skip to skip")
     thumb = "/d"
     try:
@@ -1560,353 +1557,382 @@ async def txt_handler(bot: Client, m: Message):
         print(f"Thumb handling error: {e}")
         thumb = "/d"
 
-    # Channel ID
-    await editable.edit("Send Channel ID or /d for current chat")
-    try:
-        input7: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
-        raw_text7 = input7.text
-        await input7.delete(True)
-    except asyncio.TimeoutError:
-        raw_text7 = '/d'
+    # ===== AUTO-DETECT CHAT (NO PROMPT) =====
+    channel_id = m.chat.id   # use the chat where command was sent
 
-    if raw_text7 == '/d':
-        channel_id = m.chat.id
-    else:
-        channel_id = int(raw_text7)
+    # Check if bot is admin (for groups/supergroups)
+    if m.chat.type in ["group", "supergroup"]:
+        try:
+            bot_member = await bot.get_chat_member(channel_id, bot.me.id)
+            if bot_member.status not in ["administrator", "creator"]:
+                await editable.edit("⚠️ I am not admin in this chat. Please make me admin to upload.")
+                return
+        except Exception as e:
+            await editable.edit(f"⚠️ Could not verify admin status: {str(e)}")
+            return
 
-    # 🔥 NEW: Auto-topic logic
-    topic_thread_id = None
+    # ===== AUTO-TOPIC PER FOLDER =====
     user_settings = get_user_settings(m.from_user.id, bot_username)
     auto_topic = user_settings.get("auto_topic", False)
+    folder_topics = {}
+    main_topic_id = None
+
     if auto_topic:
         try:
             target_chat = await bot.get_chat(channel_id)
             if target_chat.type == "supergroup":
-                topic = await bot.create_forum_topic(channel_id, title=b_name[:100])
-                topic_thread_id = topic.id
-                await editable.edit(f"✅ Topic created: {b_name[:50]}")
-            elif target_chat.type == "group":
-                # Normal groups can't have topics, but we'll still send normally
-                await editable.edit("ℹ️ Auto-topic is only for supergroups. Skipping.")
+                # Create a topic for each folder
+                for folder in folders.keys():
+                    topic_title = f"{folder} - {b_name}" if b_name else folder
+                    topic = await bot.create_forum_topic(channel_id, title=topic_title[:100])
+                    folder_topics[folder] = topic.id
+                    await editable.edit(f"✅ Topic created: {topic_title[:50]}")
+                # Main summary topic
+                main_topic = await bot.create_forum_topic(channel_id, title=f"📊 Summary - {b_name[:80]}")
+                main_topic_id = main_topic.id
             else:
-                await editable.edit("ℹ️ Auto-topic is only for groups/supergroups. Skipping.")
+                await editable.edit("ℹ️ Auto‑topic only works in supergroups. Skipping.")
+                auto_topic = False
         except Exception as e:
-            await editable.edit(f"⚠️ Failed to create topic: {str(e)}")
-            topic_thread_id = None
+            await editable.edit(f"⚠️ Failed to create topics: {str(e)}")
+            auto_topic = False
 
     await editable.delete()
 
+    # ===== PROCESS EACH FOLDER =====
     failed_count = 0
-    count = int(raw_text)
-    arg = int(raw_text)
+    total_success = 0
+    processed_items = 0
 
-    # Main loop
-    try:
-        for i in range(arg-1, len(links)):
-            Vxy = links[i][1].replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
-            url = "https://" + Vxy
-            link0 = "https://" + Vxy
+    all_items = []
+    for folder, links in folders.items():
+        for title, url in links:
+            all_items.append((folder, title, url))
+    items_to_process = all_items[start_index:]
 
-            name1 = links[i][0].replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-            if "," in raw_text3:
-                name = f'{PRENAME} {name1[:60]}'
+    folder_stats = {}
+
+    for idx, (folder, title, url) in enumerate(items_to_process, start=1):
+        folder_stats.setdefault(folder, {"success": 0, "failed": 0})
+        topic_id = folder_topics.get(folder) if auto_topic else None
+
+        # Prepare name
+        name1 = title.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+        if "," in raw_text3:
+            name = f'{PRENAME} {name1[:60]}'
+        else:
+            name = f'{name1[:60]}'
+
+        # User settings (may override)
+        user_settings = get_user_settings(m.from_user.id, bot_username)
+        caption_style = user_settings.get("caption_style", "boxed_style")
+        # Auto‑grouping override
+        if user_settings.get("auto_grouping", False):
+            group_chat_id = db.get_group_for_file(m.from_user.id, name1, bot_username)
+            if group_chat_id:
+                channel_id = group_chat_id
+                topic_id = None
+
+        # ===== URL TRANSFORMATIONS (copied verbatim from original) =====
+        # The following is the full transformation block from the original txt_handler
+        # We must include it exactly as it was.
+        Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
+        url = "https://" + Vxy
+        link0 = "https://" + Vxy
+
+        if "visionias" in url:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
+                    text = await resp.text()
+                    url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
+
+        if "acecwply" in url:
+            cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
+        elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split(".mkv")[0] + ".mkv"
+            if "static-trans-v1.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v1.classx.co.in", "https://appx-transcoded-videos-mcdn.akamai.net.in")
+            elif "static-trans-v2.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v2.classx.co.in", "https://transcoded-videos-v2.classx.co.in")
+            url = f"{base_clean}*{signature}"
+        elif "https://static-rec.classx.co.in/drm/" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split("?")[0]
+            base_clean = base_clean.replace("https://static-rec.classx.co.in", "https://appx-recordings-mcdn.akamai.net.in")
+            url = f"{base_clean}*{signature}"
+        elif "https://static-wsb.classx.co.in/" in url:
+            clean_url = url.split("?")[0]
+            clean_url = clean_url.replace("https://static-wsb.classx.co.in", "https://appx-wsb-gcp-mcdn.akamai.net.in")
+            url = clean_url
+        elif "https://static-db.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+                url = f"{base_url}*{key}"
             else:
-                name = f'{name1[:60]}'
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+        elif "https://static-db-v2.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+        elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+            url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
+            url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            mpd, keys = helper.get_mps_and_keys(url)
+            url = mpd
+            keys_string = " ".join([f"--key {key}" for key in keys])
+        elif "classplusapp" in url:
+            signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            response = requests.get(signed_api, timeout=40)
+            url = response.json()['url']
+        elif "tencdn.classplusapp" in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+        elif 'videos.classplusapp' in url:
+            url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{raw_text4}'}).json()['url']
+        elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+        elif "childId" in url and "parentId" in url:
+            url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={raw_text4}"
+        if "edge.api.brightcove.com" in url:
+            bcov = f'bcov_auth={cwtoken}'
+            url = url.split("bcov_auth")[0]+bcov
+        elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+            url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={raw_text4}"
+        if ".pdf*" in url:
+            url = f"https://dragoapi.vercel.app/pdf/{url}"
+        elif 'encrypted.m' in url:
+            appxkey = url.split('*')[1]
+            url = url.split('*')[0]
 
-            # ========== FRESH FETCH USER SETTINGS FOR EACH VIDEO ==========
-            user_settings = get_user_settings(m.from_user.id, bot_username)
-            caption_style = user_settings.get("caption_style", "boxed_style")
-            
-            if user_settings.get("auto_grouping", False):
-                group_chat_id = db.get_group_for_file(m.from_user.id, name1, bot_username)
-                if group_chat_id:
-                    channel_id = group_chat_id
-            # =============================================================
+        if "youtu" in url:
+            ytf = f"bv*[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[height<=?{raw_text2}]"
+        elif "embed" in url:
+            ytf = f"bestvideo[height<={raw_text2}]+bestaudio/best[height<={raw_text2}]"
+        else:
+            ytf = f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
 
-            # URL transformations (same as original code)
-            if "visionias" in url:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
-                        text = await resp.text()
-                        url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
+        if "jw-prod" in url:
+            cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
+        elif "webvideos.classplusapp." in url:
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+        elif "youtube.com" in url or "youtu.be" in url:
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+        else:
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
-            if "acecwply" in url:
-                cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
-            elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
-                base_with_params, signature = url.split("*")
-                base_clean = base_with_params.split(".mkv")[0] + ".mkv"
-                if "static-trans-v1.classx.co.in" in url:
-                    base_clean = base_clean.replace("https://static-trans-v1.classx.co.in", "https://appx-transcoded-videos-mcdn.akamai.net.in")
-                elif "static-trans-v2.classx.co.in" in url:
-                    base_clean = base_clean.replace("https://static-trans-v2.classx.co.in", "https://transcoded-videos-v2.classx.co.in")
-                url = f"{base_clean}*{signature}"
-            elif "https://static-rec.classx.co.in/drm/" in url:
-                base_with_params, signature = url.split("*")
-                base_clean = base_with_params.split("?")[0]
-                base_clean = base_clean.replace("https://static-rec.classx.co.in", "https://appx-recordings-mcdn.akamai.net.in")
-                url = f"{base_clean}*{signature}"
-            elif "https://static-wsb.classx.co.in/" in url:
-                clean_url = url.split("?")[0]
-                clean_url = clean_url.replace("https://static-wsb.classx.co.in", "https://appx-wsb-gcp-mcdn.akamai.net.in")
-                url = clean_url
-            elif "https://static-db.classx.co.in/" in url:
-                if "*" in url:
-                    base_url, key = url.split("*", 1)
-                    base_url = base_url.split("?")[0]
-                    base_url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
-                    url = f"{base_url}*{key}"
+        # Prepare captions
+        current_ist = datetime.datetime.now(IST)
+        date_str = current_ist.strftime('%d-%m-%Y')
+        time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
+        batch_blockquote = f'<blockquote>{b_name}</blockquote>'
+
+        # ===== DOWNLOAD/UPLOAD LOGIC (copied verbatim from original) =====
+        try:
+            if "drive" in url:
+                ka = await helper.download(url, name)
+                ext_actual = "pdf"
+                cc = get_video_caption(
+                    caption_style, idx, batch_blockquote, name1, 
+                    ext_actual, res, date_str, time_str, CR,
+                    topic=topic, subject=subject
+                )
+                await bot.send_document(chat_id=channel_id, document=ka, caption=cc, message_thread_id=topic_id)
+                processed_items += 1
+                folder_stats[folder]["success"] += 1
+                total_success += 1
+                os.remove(ka)
+                continue
+
+            elif ".pdf" in url:
+                if "cwmediabkt99" in url:
+                    max_retries = 3
+                    retry_delay = 4
+                    success = False
+                    for attempt in range(max_retries):
+                        try:
+                            await asyncio.sleep(retry_delay)
+                            url = url.replace(" ", "%20")
+                            scraper = cloudscraper.create_scraper()
+                            response = scraper.get(url)
+                            if response.status_code == 200:
+                                with open(f'{name}.pdf', 'wb') as file:
+                                    file.write(response.content)
+                                ext_actual = "pdf"
+                                cc = get_video_caption(
+                                    caption_style, idx, batch_blockquote, name1, 
+                                    ext_actual, res, date_str, time_str, CR,
+                                    topic=topic, subject=subject
+                                )
+                                await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_id)
+                                processed_items += 1
+                                folder_stats[folder]["success"] += 1
+                                total_success += 1
+                                os.remove(f'{name}.pdf')
+                                success = True
+                                break
+                        except Exception as e:
+                            await asyncio.sleep(retry_delay)
+                    if not success:
+                        failed_count += 1
+                        folder_stats[folder]["failed"] += 1
+                        continue
                 else:
-                    base_url = url.split("?")[0]
-                    url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
-            elif "https://static-db-v2.classx.co.in/" in url:
-                if "*" in url:
-                    base_url, key = url.split("*", 1)
-                    base_url = base_url.split("?")[0]
-                    base_url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
-                    url = f"{base_url}*{key}"
-                else:
-                    base_url = url.split("?")[0]
-                    url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
-            elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
-                url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
-                url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
-                mpd, keys = helper.get_mps_and_keys(url)
-                url = mpd
-                keys_string = " ".join([f"--key {key}" for key in keys])
-            elif "classplusapp" in url:
-                signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
-                response = requests.get(signed_api, timeout=40)
-                url = response.json()['url']
-            elif "tencdn.classplusapp" in url:
-                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
-                params = {"url": f"{url}"}
-                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
-                url = response.json()['url']
-            elif 'videos.classplusapp' in url:
-                url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{raw_text4}'}).json()['url']
-            elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url:
-                headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
-                params = {"url": f"{url}"}
-                response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
-                url = response.json()['url']
-            elif "childId" in url and "parentId" in url:
-                url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={raw_text4}"
-            if "edge.api.brightcove.com" in url:
-                bcov = f'bcov_auth={cwtoken}'
-                url = url.split("bcov_auth")[0]+bcov
-            elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
-                url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={raw_text4}"
-            if ".pdf*" in url:
-                url = f"https://dragoapi.vercel.app/pdf/{url}"
-            elif 'encrypted.m' in url:
-                appxkey = url.split('*')[1]
-                url = url.split('*')[0]
-
-            if "youtu" in url:
-                ytf = f"bv*[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[height<=?{raw_text2}]"
-            elif "embed" in url:
-                ytf = f"bestvideo[height<={raw_text2}]+bestaudio/best[height<={raw_text2}]"
-            else:
-                ytf = f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
-
-            if "jw-prod" in url:
-                cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
-            elif "webvideos.classplusapp." in url:
-                cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
-            elif "youtube.com" in url or "youtu.be" in url:
-                cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
-            else:
-                cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
-
-            # Prepare captions
-            current_ist = datetime.datetime.now(IST)
-            date_str = current_ist.strftime('%d-%m-%Y')
-            time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
-            batch_blockquote = f'<blockquote>{b_name}</blockquote>'
-
-            try:
-                if "drive" in url:
-                    ka = await helper.download(url, name)
+                    cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
+                    download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                    os.system(download_cmd)
                     ext_actual = "pdf"
                     cc = get_video_caption(
-                        caption_style, count, batch_blockquote, name1, 
+                        caption_style, idx, batch_blockquote, name1, 
                         ext_actual, res, date_str, time_str, CR,
                         topic=topic, subject=subject
                     )
-                    await bot.send_document(chat_id=channel_id, document=ka, caption=cc, message_thread_id=topic_thread_id)
-                    count += 1
-                    os.remove(ka)
-                    continue
+                    await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_id)
+                    processed_items += 1
+                    folder_stats[folder]["success"] += 1
+                    total_success += 1
+                    os.remove(f'{name}.pdf')
+                continue
 
-                elif ".pdf" in url:
-                    if "cwmediabkt99" in url:
-                        max_retries = 3
-                        retry_delay = 4
-                        success = False
-                        for attempt in range(max_retries):
-                            try:
-                                await asyncio.sleep(retry_delay)
-                                url = url.replace(" ", "%20")
-                                scraper = cloudscraper.create_scraper()
-                                response = scraper.get(url)
-                                if response.status_code == 200:
-                                    with open(f'{name}.pdf', 'wb') as file:
-                                        file.write(response.content)
-                                    ext_actual = "pdf"
-                                    cc = get_video_caption(
-                                        caption_style, count, batch_blockquote, name1, 
-                                        ext_actual, res, date_str, time_str, CR,
-                                        topic=topic, subject=subject
-                                    )
-                                    await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_thread_id)
-                                    count += 1
-                                    os.remove(f'{name}.pdf')
-                                    success = True
-                                    break
-                            except Exception as e:
-                                await asyncio.sleep(retry_delay)
-                        if not success:
-                            await m.reply_text(f"Failed to download PDF after retries.")
-                            failed_count += 1
-                            count += 1
-                            continue
-                    else:
-                        cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                        os.system(download_cmd)
-                        ext_actual = "pdf"
+            elif ".ws" in url and url.endswith(".ws"):
+                await helper.pdf_download(f"{api_url}utkash-ws?url={url}&authorization={api_token}", f"{name}.html")
+                time.sleep(1)
+                ext_actual = "html"
+                cc = get_video_caption(
+                    caption_style, idx, batch_blockquote, name1, 
+                    ext_actual, res, date_str, time_str, CR,
+                    topic=topic, subject=subject
+                )
+                await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, message_thread_id=topic_id)
+                os.remove(f'{name}.html')
+                processed_items += 1
+                folder_stats[folder]["success"] += 1
+                total_success += 1
+                continue
+
+            elif any(ext in url for ext in [".jpg", ".jpeg", ".png"]):
+                ext_actual = url.split('.')[-1]
+                cmd = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
+                os.system(cmd)
+                cc = get_video_caption(
+                    caption_style, idx, batch_blockquote, name1, 
+                    ext_actual, res, date_str, time_str, CR,
+                    topic=topic, subject=subject
+                )
+                await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_id)
+                processed_items += 1
+                folder_stats[folder]["success"] += 1
+                total_success += 1
+                os.remove(f'{name}.{ext_actual}')
+                continue
+
+            elif any(ext in url for ext in [".mp3", ".wav", ".m4a"]):
+                ext_actual = url.split('.')[-1]
+                cmd = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
+                os.system(cmd)
+                cc = get_video_caption(
+                    caption_style, idx, batch_blockquote, name1, 
+                    ext_actual, res, date_str, time_str, CR,
+                    topic=topic, subject=subject
+                )
+                await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_id)
+                processed_items += 1
+                folder_stats[folder]["success"] += 1
+                total_success += 1
+                os.remove(f'{name}.{ext_actual}')
+                continue
+
+            elif 'encrypted.m' in url:
+                Show = f"<i><b>⚡ Video APPX Encrypted Downloading</b></i>\n<blockquote><b>{str(idx).zfill(3)}) {name1}</b></blockquote>"
+                prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
+                try:
+                    res_file = await helper.download_and_decrypt_video(url, cmd, name, appxkey)
+                    filename = res_file
+                    await prog.delete(True)
+                    if os.path.exists(filename):
+                        ext_actual = os.path.splitext(filename)[1].lstrip('.')
                         cc = get_video_caption(
-                            caption_style, count, batch_blockquote, name1, 
+                            caption_style, idx, batch_blockquote, name1, 
                             ext_actual, res, date_str, time_str, CR,
                             topic=topic, subject=subject
                         )
-                        await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_thread_id)
-                        count += 1
-                        os.remove(f'{name}.pdf')
-                    continue
-
-                elif ".ws" in url and url.endswith(".ws"):
-                    await helper.pdf_download(f"{api_url}utkash-ws?url={url}&authorization={api_token}", f"{name}.html")
-                    time.sleep(1)
-                    ext_actual = "html"
-                    cc = get_video_caption(
-                        caption_style, count, batch_blockquote, name1, 
-                        ext_actual, res, date_str, time_str, CR,
-                        topic=topic, subject=subject
-                    )
-                    await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, message_thread_id=topic_thread_id)
-                    os.remove(f'{name}.html')
-                    count += 1
-                    continue
-
-                elif any(ext in url for ext in [".jpg", ".jpeg", ".png"]):
-                    ext_actual = url.split('.')[-1]
-                    cmd = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
-                    os.system(cmd)
-                    cc = get_video_caption(
-                        caption_style, count, batch_blockquote, name1, 
-                        ext_actual, res, date_str, time_str, CR,
-                        topic=topic, subject=subject
-                    )
-                    await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_thread_id)
-                    count += 1
-                    os.remove(f'{name}.{ext_actual}')
-                    continue
-
-                elif any(ext in url for ext in [".mp3", ".wav", ".m4a"]):
-                    ext_actual = url.split('.')[-1]
-                    cmd = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
-                    os.system(cmd)
-                    cc = get_video_caption(
-                        caption_style, count, batch_blockquote, name1, 
-                        ext_actual, res, date_str, time_str, CR,
-                        topic=topic, subject=subject
-                    )
-                    await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_thread_id)
-                    os.remove(f'{name}.{ext_actual}')
-                    count += 1
-                    continue
-
-                elif 'encrypted.m' in url:
-                    Show = f"<i><b>⚡ Video APPX Encrypted Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
-                    prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_thread_id)
-                    try:
-                        res_file = await helper.download_and_decrypt_video(url, cmd, name, appxkey)
-                        filename = res_file
-                        await prog.delete(True)
-                        if os.path.exists(filename):
-                            ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                            cc = get_video_caption(
-                                caption_style, count, batch_blockquote, name1, 
-                                ext_actual, res, date_str, time_str, CR,
-                                topic=topic, subject=subject
-                            )
-                            await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_thread_id)
-                            count += 1
-                        else:
-                            await bot.send_message(channel_id, f'⚠️ Failed to decrypt.', message_thread_id=topic_thread_id)
-                            failed_count += 1
-                            count += 1
-                            continue
-                    except Exception as e:
-                        await bot.send_message(channel_id, f'⚠️ Error: {str(e)}', message_thread_id=topic_thread_id)
+                        await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
+                        processed_items += 1
+                        folder_stats[folder]["success"] += 1
+                        total_success += 1
+                    else:
                         failed_count += 1
-                        count += 1
+                        folder_stats[folder]["failed"] += 1
                         continue
-
-                elif 'drmcdni' in url or 'drm/wv' in url:
-                    Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
-                    prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_thread_id)
-                    res_file = await helper.decrypt_and_merge_video(mpd, keys_string, path, name, raw_text2)
-                    filename = res_file
-                    await prog.delete(True)
-                    ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                    cc = get_video_caption(
-                        caption_style, count, batch_blockquote, name1, 
-                        ext_actual, res, date_str, time_str, CR,
-                        topic=topic, subject=subject
-                    )
-                    await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_thread_id)
-                    count += 1
-                    await asyncio.sleep(1)
+                except Exception as e:
+                    await bot.send_message(channel_id, f'⚠️ Error: {str(e)}', message_thread_id=topic_id)
+                    failed_count += 1
+                    folder_stats[folder]["failed"] += 1
                     continue
 
-                else:
-                    Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
-                    prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_thread_id)
-                    res_file = await helper.download_video(url, cmd, name)
-                    filename = res_file
-                    await prog.delete(True)
-                    ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                    cc = get_video_caption(
-                        caption_style, count, batch_blockquote, name1, 
-                        ext_actual, res, date_str, time_str, CR,
-                        topic=topic, subject=subject
-                    )
-                    await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_thread_id)
-                    count += 1
-                    time.sleep(1)
-
-            except Exception as e:
-                await bot.send_message(channel_id, f'⚠️ Download Failed: {str(e)}', message_thread_id=topic_thread_id)
-                failed_count += 1
-                count += 1
+            elif 'drmcdni' in url or 'drm/wv' in url:
+                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(idx).zfill(3)}) {name1}</b></blockquote>"
+                prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
+                res_file = await helper.decrypt_and_merge_video(mpd, keys_string, path, name, raw_text2)
+                filename = res_file
+                await prog.delete(True)
+                ext_actual = os.path.splitext(filename)[1].lstrip('.')
+                cc = get_video_caption(
+                    caption_style, idx, batch_blockquote, name1, 
+                    ext_actual, res, date_str, time_str, CR,
+                    topic=topic, subject=subject
+                )
+                await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
+                processed_items += 1
+                folder_stats[folder]["success"] += 1
+                total_success += 1
+                await asyncio.sleep(1)
                 continue
 
-    except Exception as e:
-        await m.reply_text(str(e))
-        time.sleep(2)
+            else:
+                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(idx).zfill(3)}) {name1}</b></blockquote>"
+                prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
+                res_file = await helper.download_video(url, cmd, name)
+                filename = res_file
+                await prog.delete(True)
+                ext_actual = os.path.splitext(filename)[1].lstrip('.')
+                cc = get_video_caption(
+                    caption_style, idx, batch_blockquote, name1, 
+                    ext_actual, res, date_str, time_str, CR,
+                    topic=topic, subject=subject
+                )
+                await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
+                processed_items += 1
+                folder_stats[folder]["success"] += 1
+                total_success += 1
+                time.sleep(1)
 
-    # Summary
-    success_count = len(links) - failed_count
+        except Exception as e:
+            await bot.send_message(channel_id, f'⚠️ Download Failed: {str(e)}', message_thread_id=topic_id)
+            failed_count += 1
+            folder_stats[folder]["failed"] += 1
+            continue
+
+    # ===== FINAL SUMMARY =====
+    success_count = total_success
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
-    # Note: Adjust counts as per your existing code; these variables are already defined earlier.
-
-    # 🔥 NEW SUMMARY FORMAT
     summary = (
         f"-┈━═.•°✅ Completed ✅°•.═━┈-\n"
         f"🎯Batch Name : {b_name}\n"
-        f"🔗 Total URLs: {len(links)}\n"
+        f"🔗 Total URLs: {all_links_count}\n"
         f"┃   ┠🔴 Total Failed URLs: {failed_count}\n"
         f"┃   ┠🟢 Total Successful URLs: {success_count}\n"
         f"┃   ┃   ┠🎥 Total Video URLs: {video_count}\n"
@@ -1914,15 +1940,16 @@ async def txt_handler(bot: Client, m: Message):
         f"┃   ┃   ┠📸 Total IMAGE URLs: {img_count}"
     )
 
-    # Send summary with topic if auto-topic is on
-    await bot.send_message(channel_id, summary, message_thread_id=topic_thread_id)
+    if auto_topic and main_topic_id:
+        await bot.send_message(channel_id, summary, message_thread_id=main_topic_id)
+    else:
+        await bot.send_message(channel_id, summary)
 
 # ========================= SINGLE LINK HANDLER =========================
 @bot.on_message(filters.text & filters.private)
 async def text_handler(bot: Client, m: Message):
     if m.from_user.is_bot:
         return
-    # Ignore commands
     if m.text and m.text.startswith('/'):
         return
     links = m.text
@@ -2058,18 +2085,16 @@ async def text_handler(bot: Client, m: Message):
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         single_batch = '<blockquote>Single Video</blockquote>'
         
-        # Get user's caption style
         user_settings = get_user_settings(m.from_user.id, bot_username)
         caption_style = user_settings.get("caption_style", "boxed_style")
 
-        # Direct download using helper
         res_file = await helper.download_video(url, cmd, name)
         if os.path.exists(res_file):
             ext_actual = os.path.splitext(res_file)[1].lstrip('.')
             cc = get_video_caption(
                 caption_style, count, single_batch, name1, 
                 ext_actual, res, date_str, time_str, CREDIT,
-                topic="", subject=""  # single link doesn't have topic/subject
+                topic="", subject=""
             )
             await helper.send_vid(bot, m, cc, res_file, thumb, name, None, channel_id, watermark=watermark)
         else:
