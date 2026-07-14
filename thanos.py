@@ -83,12 +83,10 @@ def exec(cmd):
         output = process.stdout.decode()
         print(output)
         return output
-
 def pull_run(work, cmds):
     with concurrent.futures.ThreadPoolExecutor(max_workers=work) as executor:
         print("Waiting for tasks to complete")
         fut = executor.map(exec,cmds)
-
 async def aio(url,name):
     k = f'{name}.pdf'
     async with aiohttp.ClientSession() as session:
@@ -366,21 +364,20 @@ async def download_video(url, cmd, name):
             retry_count += 1
             await asyncio.sleep(3)
     
-    # Check for generated file – same as original
+    # Check for generated file – try various extensions
+    # First, check if the exact name exists
     if os.path.isfile(name):
         return name
-    elif os.path.isfile(f"{name}.webm"):
-        return f"{name}.webm"
-    
-    name_clean = name.split(".")[0]
-    if os.path.isfile(f"{name_clean}.mkv"):
-        return f"{name_clean}.mkv"
-    elif os.path.isfile(f"{name_clean}.mp4"):
-        return f"{name_clean}.mp4"
-    elif os.path.isfile(f"{name_clean}.mp4.webm"):
-        return f"{name_clean}.mp4.webm"
-    
-    return f"{name_clean}.mp4"
+    # Check common extensions
+    base = name if '.' not in name else name.split('.')[0]
+    for ext in ['.mp4', '.mkv', '.webm', '.m4a', '.mp3', '.pdf']:
+        if os.path.isfile(f"{base}{ext}"):
+            return f"{base}{ext}"
+    # Check for .mp4.webm etc.
+    if os.path.isfile(f"{base}.mp4.webm"):
+        return f"{base}.mp4.webm"
+    # If still not found, return the most likely name
+    return f"{base}.mp4"
 
 async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, channel_id, watermark="Thanos", topic_thread_id: int = None):
     try:
