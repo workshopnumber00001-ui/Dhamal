@@ -23,7 +23,7 @@ from base64 import b64decode
 import math
 import m3u8
 from urllib.parse import urljoin
-from vars import *  # Add this import
+from vars import *
 
 def get_duration(filename):
     result = subprocess.run(
@@ -83,10 +83,12 @@ def exec(cmd):
         output = process.stdout.decode()
         print(output)
         return output
+
 def pull_run(work, cmds):
     with concurrent.futures.ThreadPoolExecutor(max_workers=work) as executor:
         print("Waiting for tasks to complete")
         fut = executor.map(exec,cmds)
+
 async def aio(url,name):
     k = f'{name}.pdf'
     async with aiohttp.ClientSession() as session:
@@ -321,10 +323,23 @@ async def fast_download(url, name):
     
     return None
 
-# ✅ SUPER FAST download_video
+# -------------------------------------------------------------
+# IMPROVED download_video – uses glob to find the actual file
+# -------------------------------------------------------------
 async def download_video(url, cmd, name):
+    """
+    Download video using yt-dlp and return the actual filename.
+    Uses glob to find the file regardless of extension.
+    """
     retry_count = 0
-    max_retries = 2
+    max_retries = 3
+    
+    # Remove any existing files with this base name
+    for f in glob.glob(f"{name}.*"):
+        try:
+            os.remove(f)
+        except:
+            pass
     
     while retry_count < max_retries:
         if retry_count == 0:
@@ -353,7 +368,19 @@ async def download_video(url, cmd, name):
                 continue
             
             if process.returncode == 0:
-                break
+                # Download succeeded – find the file
+                found_files = glob.glob(f"{name}.*")
+                if found_files:
+                    # Return the first found file
+                    return found_files[0]
+                else:
+                    # Try with common extensions
+                    for ext in ['.mp4', '.mkv', '.webm', '.m4a', '.mp3', '.pdf']:
+                        if os.path.exists(f"{name}{ext}"):
+                            return f"{name}{ext}"
+                    print(f"⚠️ No file found for {name} after successful download.")
+                    retry_count += 1
+                    continue
             else:
                 error_msg = stderr.decode() if stderr else "Unknown error"
                 print(f"❌ Download failed (attempt {retry_count+1}): {error_msg[:200]}")
@@ -365,23 +392,22 @@ async def download_video(url, cmd, name):
             retry_count += 1
             await asyncio.sleep(3)
     
-    # Check for generated file
-    if os.path.isfile(name):
-        return name
-    elif os.path.isfile(f"{name}.webm"):
-        return f"{name}.webm"
+    # After all retries, try to find any file with this base name
+    found = glob.glob(f"{name}.*")
+    if found:
+        return found[0]
     
-    name_clean = name.split(".")[0]
-    if os.path.isfile(f"{name_clean}.mkv"):
-        return f"{name_clean}.mkv"
-    elif os.path.isfile(f"{name_clean}.mp4"):
-        return f"{name_clean}.mp4"
-    elif os.path.isfile(f"{name_clean}.mp4.webm"):
-        return f"{name_clean}.mp4.webm"
+    # Fallback: return the most likely name
+    for ext in ['.mp4', '.mkv', '.webm', '.m4a']:
+        if os.path.exists(f"{name}{ext}"):
+            return f"{name}{ext}"
     
-    return f"{name_clean}.mp4"
+    # If still nothing, return name.mp4 as a guess
+    return f"{name}.mp4"
 
-# 🔥 MODIFIED send_vid with topic_thread_id support
+# -------------------------------------------------------------
+# UPDATED send_vid – accepts topic_thread_id and uses it
+# -------------------------------------------------------------
 async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, channel_id, watermark="Thanos", topic_thread_id: int = None):
     try:
         temp_thumb = None
@@ -433,7 +459,8 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
             
             thumbnail = temp_thumb if os.path.exists(temp_thumb) else None
 
-        await prog.delete(True)
+        if prog:
+            await prog.delete(True)
 
         reply1 = await bot.send_message(channel_id, f" **Uploading Video:**\n<blockquote>{name}</blockquote>", message_thread_id=topic_thread_id)
         reply = await m.reply_text(f"🖼 **Generating Thumbnail:**\n<blockquote>{name}</blockquote>")
@@ -451,7 +478,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                     chat_id=channel_id,
                     video=filename,
                     caption=cc,
-                    message_thread_id=topic_thread_id,  # <-- ADDED
+                    message_thread_id=topic_thread_id,
                     supports_streaming=True,
                     height=720,
                     width=1280,
@@ -460,12 +487,13 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                     progress=progress_bar,
                     progress_args=(reply, start_time)
                 )
-            except Exception:
+            except Exception as e:
+                print(f"Video upload failed, sending as document: {e}")
                 sent_message = await bot.send_document(
                     chat_id=channel_id,
                     document=filename,
                     caption=cc,
-                    message_thread_id=topic_thread_id,  # <-- ADDED
+                    message_thread_id=topic_thread_id,
                     progress=progress_bar,
                     progress_args=(reply, start_time)
                 )
@@ -499,7 +527,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                             chat_id=channel_id,
                             video=part,
                             caption=part_caption,
-                            message_thread_id=topic_thread_id,  # <-- ADDED
+                            message_thread_id=topic_thread_id,
                             file_name=part_filename,
                             supports_streaming=True,
                             height=720,
@@ -516,7 +544,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                             chat_id=channel_id,
                             document=part,
                             caption=part_caption,
-                            message_thread_id=topic_thread_id,  # <-- ADDED
+                            message_thread_id=topic_thread_id,
                             file_name=part_filename,
                             progress=progress_bar,
                             progress_args=(upload_msg, time.time())
