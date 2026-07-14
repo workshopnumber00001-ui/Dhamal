@@ -24,7 +24,6 @@ import math
 import m3u8
 from urllib.parse import urljoin
 from vars import *  # Add this import
-# Removed: from db import Database  <-- this was causing circular import
 
 def get_duration(filename):
     result = subprocess.run(
@@ -64,7 +63,6 @@ def split_large_video(file_path, max_size_mb=1900):
 
     return output_files
 
-
 def duration(filename):
     result = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                              "format=duration", "-of",
@@ -73,14 +71,12 @@ def duration(filename):
         stderr=subprocess.STDOUT)
     return float(result.stdout)
 
-
 def get_mps_and_keys(api_url):
     response = requests.get(api_url)
     response_json = response.json()
     mpd = response_json.get('mpd_url')
     keys = response_json.get('keys')
     return mpd, keys
-
 
 def exec(cmd):
         process = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -101,7 +97,6 @@ async def aio(url,name):
                 await f.close()
     return k
 
-
 async def download(url,name):
     ka = f'{name}.pdf'
     async with aiohttp.ClientSession() as session:
@@ -121,7 +116,6 @@ async def pdf_download(url, file_name, chunk_size=1024 * 10):
             if chunk:
                 fd.write(chunk)
     return file_name   
-   
 
 def parse_vid_info(info):
     info = info.strip()
@@ -143,7 +137,6 @@ def parse_vid_info(info):
                 pass
     return new_info
 
-
 def vid_info(info):
     info = info.strip()
     info = info.split("\n")
@@ -163,7 +156,6 @@ def vid_info(info):
             except:
                 pass
     return new_info
-
 
 async def decrypt_and_merge_video(mpd_url, keys_string, output_path, output_name, quality="720"):
     try:
@@ -239,8 +231,6 @@ async def run(cmd):
     if stderr:
         return f'[stderr]\n{stderr.decode()}'
 
-    
-
 def old_download(url, file_name, chunk_size = 1024 * 10 * 10):
     if os.path.exists(file_name):
         os.remove(file_name)
@@ -251,7 +241,6 @@ def old_download(url, file_name, chunk_size = 1024 * 10 * 10):
                 fd.write(chunk)
     return file_name
 
-
 def human_readable_size(size, decimal_places=2):
     for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
         if size < 1024.0 or unit == 'PB':
@@ -259,13 +248,11 @@ def human_readable_size(size, decimal_places=2):
         size /= 1024.0
     return f"{size:.{decimal_places}f} {unit}"
 
-
 def time_name():
     date = datetime.date.today()
     now = datetime.datetime.now()
     current_time = now.strftime("%H%M%S")
     return f"{date} {current_time}.mp4"
-
 
 async def fast_download(url, name):
     max_retries = 5
@@ -394,8 +381,7 @@ async def download_video(url, cmd, name):
     
     return f"{name_clean}.mp4"
 
-
-
+# 🔥 MODIFIED send_vid with topic_thread_id support
 async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, channel_id, watermark="Thanos", topic_thread_id: int = None):
     try:
         temp_thumb = None
@@ -449,7 +435,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
 
         await prog.delete(True)
 
-        reply1 = await bot.send_message(channel_id, f" **Uploading Video:**\n<blockquote>{name}</blockquote>")
+        reply1 = await bot.send_message(channel_id, f" **Uploading Video:**\n<blockquote>{name}</blockquote>", message_thread_id=topic_thread_id)
         reply = await m.reply_text(f"🖼 **Generating Thumbnail:**\n<blockquote>{name}</blockquote>")
 
         file_size_mb = os.path.getsize(filename) / (1024 * 1024)
@@ -465,6 +451,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                     chat_id=channel_id,
                     video=filename,
                     caption=cc,
+                    message_thread_id=topic_thread_id,  # <-- ADDED
                     supports_streaming=True,
                     height=720,
                     width=1280,
@@ -478,6 +465,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                     chat_id=channel_id,
                     document=filename,
                     caption=cc,
+                    message_thread_id=topic_thread_id,  # <-- ADDED
                     progress=progress_bar,
                     progress_args=(reply, start_time)
                 )
@@ -511,6 +499,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                             chat_id=channel_id,
                             video=part,
                             caption=part_caption,
+                            message_thread_id=topic_thread_id,  # <-- ADDED
                             file_name=part_filename,
                             supports_streaming=True,
                             height=720,
@@ -527,6 +516,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                             chat_id=channel_id,
                             document=part,
                             caption=part_caption,
+                            message_thread_id=topic_thread_id,  # <-- ADDED
                             file_name=part_filename,
                             progress=progress_bar,
                             progress_args=(upload_msg, time.time())
