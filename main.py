@@ -198,7 +198,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"🎓 Batch Name : {plain_batch}\n\n"
             f"📥 Downloaded by: {CR}"
         )
-    # All other styles (keep your original full style block here – I'm showing a fallback)
+    # All other styles – fallback
     else:
         return (
             f"\n<b>🧭 Index ID:</b> {str(count).zfill(3)}\n\n"
@@ -1051,20 +1051,20 @@ async def txt_handler(bot: Client, m: Message):
     await editable.delete()
 
     # ===== PROCESS EACH FOLDER =====
-    # Create a flat list of all items with their folder
     all_items = []
     for folder, links in folders.items():
         for title, url in links:
             all_items.append((folder, title, url))
 
-    # Start from the given index
     items_to_process = all_items[start_index:]
 
-    # Counters (same as original)
-    failed_count = 0
-    count = start_index + 1  # to maintain ID numbering
+    # ---------- FIX: define caption_style before loop ----------
+    user_settings = get_user_settings(m.from_user.id, bot_username)
+    caption_style = user_settings.get("caption_style", "boxed_style")
 
-    # ===== MAIN LOOP – ORIGINAL DOWNLOAD LOGIC WITH TOPIC ID =====
+    failed_count = 0
+    count = start_index + 1
+
     for folder, title, url in items_to_process:
         topic_id = folder_topics.get(folder) if auto_topic else None
 
@@ -1075,9 +1075,7 @@ async def txt_handler(bot: Client, m: Message):
         else:
             name = f'{name1[:60]}'
 
-        # ---- URL transformations – copy your ENTIRE original block here ----
-        # (visionias, classx, classplus, testbook, etc.)
-        # I'm including the full block from the original code for completeness.
+        # ---- URL transformations (copy your original block here) ----
         Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = "https://" + Vxy
         link0 = "https://" + Vxy
