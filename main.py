@@ -40,6 +40,7 @@ from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton
 )
+from pyrogram.enums import ParseMode
 from pyrogram.errors import (
     FloodWait,
     BadRequest,
@@ -56,7 +57,6 @@ from pyrogram.errors.exceptions.bad_request_400 import MessageNotModified
 # 🧠 Bot Modules
 import auth
 import thanos as helper
-from html_handler import html_handler
 from thanos import *
 
 from clean import register_clean_handler
@@ -120,25 +120,6 @@ STYLE_DISPLAY_NAMES = {
     "modern_border": "🏛️ Modern Border",
     "ultra_clean": "💎 Ultra Clean",
     "bracket_style": "📦 Bracket Style",
-    "classic_box": "📦 Classic Box",
-    "double_line": "〰️ Double Line",
-    "arrow_flow": "➡️ Arrow Flow",
-    "dot_matrix": "🔘 Dot Matrix",
-    "star_border": "⭐ Star Border",
-    "curved_lines": "🌀 Curved Lines",
-    "thin_lines": "➖ Thin Lines",
-    "diamond_frame": "💎 Diamond Frame",
-    "minimalist": "➖ Minimalist",
-    "bold_box": "⬛ Bold Box",
-    "light_shadow": "🌥️ Light Shadow",
-    "hexagon": "⬡ Hexagon",
-    "split_line": "✂️ Split Line",
-    "square_frame": "▣ Square Frame",
-    "zigzag": "⚡ Zigzag",
-    "clean_tab": "📋 Clean Tab",
-    "slanted": "📐 Slanted",
-    "dotted_box": "◌ Dotted Box",
-    "ultra_modern": "🌀 Ultra Modern",
 }
 
 ALL_STYLES = list(STYLE_DISPLAY_NAMES.keys())
@@ -154,6 +135,7 @@ bot = Client(
     in_memory=True
 )
 
+# Register clean handler
 register_clean_handler(bot)
 
 # ========================= VIDEO CAPTION STYLES =========================
@@ -162,30 +144,29 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
     
     plain_batch = re.sub(r'<[^>]+>', '', batch_blockquote).strip()
     
-    # ========== BRACKET STYLE (DEFAULT) ==========
+    # ---------- BRACKET STYLE ----------
     if style == "bracket_style":
-        return (
-            f"\n[──────────────────────]\n"
-            f"│  ✦ ID    : {str(count).zfill(3)}\n"
-            f"│\n"
-            f"│  Batch : {plain_batch}\n"
-            f"│\n"
-            f"│  Title : {name1}\n"
-            f"│\n"
-            f"│  Ext   : {CR}.{ext_actual}\n"
-            f"│\n"
-            f"│  Res   : {res}\n"
-            f"│\n"
-            f"│  ✦ Download By : {CR}\n"
-            f"[──────────────────────]\n"
-            f"\n📅 {time_str}\n"
+        if ext_actual.lower() == "pdf":
+            file_type = "📄 FILE"
+            title_suffix = " PDF"
+        else:
+            file_type = "🎥 VIDEO"
+            title_suffix = ""
+        caption = (
+            f"╭━━━━━━━━━━━╮\n"
+            f"{file_type} ID: {str(count).zfill(3)}\n"
+            f"╰━━━━━━━━━━━╯\n"
+            f"📄 Title: {name1}{title_suffix}\n"
         )
-    
-    # ========== OTHER STYLES (all 30+ styles) ==========
-    # I'm including them all – you already have them in your original file.
-    # For brevity, I'm not repeating them here; but in the actual code I will include them all.
-    # The fallback below will handle any style not explicitly matched.
+        if ext_actual.lower() != "pdf":
+            caption += f"📏 Resolution: {res}\n"
+        caption += f"💾 Format: {CR}.{ext_actual}\n\n"
+        caption += f"🔖 Batch: {plain_batch}\n\n"
+        caption += f"📥 Downloaded by: {CR}\n\n"
+        caption += f"📅 {time_str}\n"
+        return caption
 
+    # ---------- MINIMAL GLASS ----------
     elif style == "minimal_glass":
         return (
             f"\n<b>┌───⧫ 𝐕𝐈𝐃𝐄𝐎 𝐈𝐍𝐅𝐎 ⧫───┐</b>\n"
@@ -202,12 +183,301 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"│\n"
             f"└───⧫ {time_str} ⧫───┘\n"
         )
-    # ... (all other styles go here; they are unchanged from your original)
-    # I will include them all in the final file to avoid any "style not found" issues.
-    # But to save space in this message, I'll use a fallback that returns a basic caption.
-    # However, you have the full styles in your original main.py, so I'll copy them verbatim.
+    
+    # ---------- NEON GLOW ----------
+    elif style == "neon_glow":
+        return (
+            f"\n<b>◤━━━━━━━━━⧫ 𝐕𝐈𝐃𝐄𝐎 ⧫━━━━━━━━━◥</b>\n\n"
+            f"  <b>🧭 ID</b> : {str(count).zfill(3)}\n"
+            f"  <b>📦 Batch</b> : {plain_batch}\n"
+            f"  <b>📄 Title</b> : {name1}\n"
+            f"  <b>⚡ Ext</b> : {CR}.{ext_actual}\n"
+            f"  <b>📊 Res</b> : {res}\n"
+            f"  <b>📆 Date</b> : {date_str}\n\n"
+            f"◣━━━━━━━⧫ <b>{CR}</b> ⧫━━━━━━━◢\n"
+            f"<i>{time_str}</i>\n"
+        )
 
-    # Fallback (if style not recognized)
+    # ---------- PREMIUM CARD ----------
+    elif style == "premium_card":
+        return (
+            f"\n<b>┏━━━━━━━━━━━━━━━━━━━━━━┓</b>\n"
+            f"<b>┃  ⚡ 𝐕𝐈𝐃𝐄𝐎 𝐃𝐄𝐓𝐀𝐈𝐋𝐒</b>\n"
+            f"<b>┣━━━━━━━━━━━━━━━━━━━━━━┫</b>\n"
+            f"<b>┃</b>\n"
+            f"<b>┃  🏷️ ID</b>  : {str(count).zfill(3)}\n"
+            f"<b>┃  📁 Batch</b> : {plain_batch}\n"
+            f"<b>┃  📌 Title</b> : {name1}\n"
+            f"<b>┃  💾 Ext</b>  : {CR}.{ext_actual}\n"
+            f"<b>┃  📐 Res</b>  : {res}\n"
+            f"<b>┃  📅 Date</b> : {date_str}\n"
+            f"<b>┃</b>\n"
+            f"<b>┣━━━━━━━━━━━━━━━━━━━━━━┫</b>\n"
+            f"<b>┃  🎯 {CR}</b>\n"
+            f"<b>┗━━━━━━━━━━━━━━━━━━━━━━┛</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+
+    # ---------- DARK FUTURISTIC ----------
+    elif style == "dark_futuristic":
+        return (
+            f"\n<b>╔═══════════════════════╗</b>\n"
+            f"<b>║  🔥 VIDEO DETAILS</b>\n"
+            f"<b>╠═══════════════════════╣</b>\n"
+            f"<b>║</b>\n"
+            f"<b>║  ◆ ID</b>    : {str(count).zfill(3)}\n"
+            f"<b>║  ◆ Batch</b> : {plain_batch}\n"
+            f"<b>║  ◆ Title</b> : {name1}\n"
+            f"<b>║  ◆ Ext</b>   : {CR}.{ext_actual}\n"
+            f"<b>║  ◆ Res</b>   : {res}\n"
+            f"<b>║  ◆ Date</b>  : {date_str}\n"
+            f"<b>║</b>\n"
+            f"<b>╠═══════════════════════╣</b>\n"
+            f"<b>║  ✦ {CR}</b>\n"
+            f"<b>╚═══════════════════════╝</b>\n\n"
+            f"<i>⏱ {time_str}</i>\n"
+        )
+
+    # ---------- CLEAN PROFESSIONAL ----------
+    elif style == "clean_professional":
+        return (
+            f"\n<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
+            f"<b>  📌 VIDEO DETAILS</b>\n"
+            f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n\n"
+            f"  <b>🆔 Index</b> : {str(count).zfill(3)}\n"
+            f"  <b>📦 Batch</b> : {plain_batch}\n"
+            f"  <b>📄 Title</b> : {name1}\n"
+            f"  <b>📎 Ext</b>   : {CR}.{ext_actual}\n"
+            f"  <b>📐 Res</b>   : {res}\n"
+            f"  <b>📆 Date</b>  : {date_str}\n\n"
+            f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
+            f"  <b>© {CR}</b>\n"
+            f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
+            f"<i>{time_str}</i>\n"
+        )
+
+    # ---------- CYBER TERMINAL ----------
+    elif style == "cyber_terminal":
+        return (
+            f"\n<b>┌─[ VIDEO ]───────────────────┐</b>\n"
+            f"<b>│</b>\n"
+            f"<b>│  ╭─▶ ID</b>    : {str(count).zfill(3)}\n"
+            f"<b>│  ├─▶ Batch</b> : {plain_batch}\n"
+            f"<b>│  ├─▶ Title</b> : {name1}\n"
+            f"<b>│  ├─▶ Ext</b>   : {CR}.{ext_actual}\n"
+            f"<b>│  ├─▶ Res</b>   : {res}\n"
+            f"<b>│  ╰─▶ Date</b>  : {date_str}\n"
+            f"<b>│</b>\n"
+            f"<b>├─────────────────────────────┤</b>\n"
+            f"<b>│  🚀 {CR}</b>\n"
+            f"<b>└─────────────────────────────┘</b>\n"
+            f"\n<i>⏱ {time_str}</i>\n"
+        )
+
+    # ---------- DUAL BORDER ----------
+    elif style == "dual_border":
+        return (
+            f"\n<b>╔══════════════════════════════╗</b>\n"
+            f"<b>║   ✦ 𝐕𝐈𝐃𝐄𝐎 𝐃𝐄𝐓𝐀𝐈𝐋𝐒 ✦</b>\n"
+            f"<b>╠══════════════════════════════╣</b>\n"
+            f"<b>║</b>\n"
+            f"<b>║  ✦ Index</b>   : {str(count).zfill(3)}\n"
+            f"<b>║  ✦ Batch</b>   : {plain_batch}\n"
+            f"<b>║  ✦ Title</b>   : {name1}\n"
+            f"<b>║  ✦ Format</b>  : {CR}.{ext_actual}\n"
+            f"<b>║  ✦ Quality</b> : {res}\n"
+            f"<b>║  ✦ Date</b>    : {date_str}\n"
+            f"<b>║</b>\n"
+            f"<b>╠══════════════════════════════╣</b>\n"
+            f"<b>║  ✦ Uploaded By</b>\n"
+            f"<b>║  ╰─ {CR}</b>\n"
+            f"<b>╚══════════════════════════════╝</b>\n\n"
+            f"<i>🕐 {time_str}</i>\n"
+        )
+
+    # ---------- ROUNDED NEON ----------
+    elif style == "rounded_neon":
+        return (
+            f"\n<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
+            f"<b>▣  🔥 VIDEO INFO</b>\n"
+            f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n\n"
+            f"  <b>⚡ ID</b>   : {str(count).zfill(3)}\n"
+            f"  <b>📦 Batch</b> : {plain_batch}\n"
+            f"  <b>📌 Title</b> : {name1}\n"
+            f"  <b>🎯 Ext</b>  : {CR}.{ext_actual}\n"
+            f"  <b>📐 Res</b>  : {res}\n"
+            f"  <b>📅 Date</b> : {date_str}\n\n"
+            f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
+            f"  <b>🌟 {CR}</b>\n"
+            f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
+            f"\n<i>⏰ {time_str}</i>\n"
+        )
+
+    # ---------- INSTAGRAM ----------
+    elif style == "instagram":
+        return (
+            f"\n<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n\n"
+            f"  <b>🎬 VIDEO</b>\n\n"
+            f"  <b>📌</b> {str(count).zfill(3)}\n"
+            f"  <b>📚</b> {plain_batch}\n"
+            f"  <b>📖</b> {name1}\n"
+            f"  <b>💾</b> {CR}.{ext_actual}\n"
+            f"  <b>📐</b> {res}\n"
+            f"  <b>📆</b> {date_str}\n\n"
+            f"<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n"
+            f"  <b>💫 {CR}</b>\n"
+            f"<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+
+    # ---------- MATRIX ----------
+    elif style == "matrix":
+        return (
+            f"\n<b>┌─────────────────────────┐</b>\n"
+            f"<b>│  ███╗  ██╗███████╗ ██████╗</b>\n"
+            f"<b>│  ████╗ ██║██╔════╝██╔═══██╗</b>\n"
+            f"<b>│  ██╔██╗██║█████╗  ██║   ██║</b>\n"
+            f"<b>│  ██║╚████║██╔══╝  ██║   ██║</b>\n"
+            f"<b>│  ██║ ╚███║██║     ╚██████╔╝</b>\n"
+            f"<b>│  ╚═╝  ╚══╝╚═╝      ╚═════╝</b>\n"
+            f"<b>├─────────────────────────┤</b>\n"
+            f"<b>│  ID</b>    : {str(count).zfill(3)}\n"
+            f"<b>│  Batch</b> : {plain_batch}\n"
+            f"<b>│  Title</b> : {name1}\n"
+            f"<b>│  Ext</b>   : {CR}.{ext_actual}\n"
+            f"<b>│  Res</b>   : {res}\n"
+            f"<b>│  Date</b>  : {date_str}\n"
+            f"<b>├─────────────────────────┤</b>\n"
+            f"<b>│  ▶ {CR}</b>\n"
+            f"<b>└─────────────────────────┘</b>\n"
+            f"\n<i>⏱ {time_str}</i>\n"
+        )
+
+    # ---------- SPACE GALAXY ----------
+    elif style == "space_galaxy":
+        return (
+            f"\n<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n"
+            f"<b>    🌟 VIDEO DETAILS</b>\n"
+            f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n\n"
+            f"  <b>🪐 Index</b> : {str(count).zfill(3)}\n"
+            f"  <b>🌌 Batch</b> : {plain_batch}\n"
+            f"  <b>📖 Title</b> : {name1}\n"
+            f"  <b>🔗 Ext</b>  : {CR}.{ext_actual}\n"
+            f"  <b>📐 Res</b>  : {res}\n"
+            f"  <b>📅 Date</b> : {date_str}\n\n"
+            f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n"
+            f"  <b>⭐ {CR}</b>\n"
+            f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n\n"
+            f"<i>🕐 {time_str}</i>\n"
+        )
+
+    # ---------- MINIMAL DOTS ----------
+    elif style == "minimal_dots":
+        return (
+            f"\n<b>· · · · · · · · · · · · · · ·</b>\n"
+            f"<b>  📌 VIDEO</b>\n"
+            f"<b>· · · · · · · · · · · · · · ·</b>\n\n"
+            f"  <b>• ID</b>    : {str(count).zfill(3)}\n"
+            f"  <b>• Batch</b> : {plain_batch}\n"
+            f"  <b>• Title</b> : {name1}\n"
+            f"  <b>• Ext</b>   : {CR}.{ext_actual}\n"
+            f"  <b>• Res</b>   : {res}\n"
+            f"  <b>• Date</b>  : {date_str}\n\n"
+            f"<b>· · · · · · · · · · · · · · ·</b>\n"
+            f"  <b>{CR}</b>\n"
+            f"<b>· · · · · · · · · · · · · · ·</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+
+    # ---------- CLEAN GLASS ----------
+    elif style == "clean_glass":
+        return (
+            f"\n<b>╭─────────────────────╮</b>\n"
+            f"<b>│  ✦ VIDEO DETAILS</b>\n"
+            f"<b>╰─────────────────────╯</b>\n\n"
+            f"  <b>ID</b>    {str(count).zfill(3)}\n"
+            f"  <b>Batch</b> {plain_batch}\n"
+            f"  <b>Title</b> {name1}\n"
+            f"  <b>Ext</b>   {CR}.{ext_actual}\n"
+            f"  <b>Res</b>   {res}\n"
+            f"  <b>Date</b>  {date_str}\n\n"
+            f"<b>─────── ✦ ───────</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  {CR}</b>\n"
+        )
+
+    # ---------- SMOOTH FLOW ----------
+    elif style == "smooth_flow":
+        return (
+            f"\n<b>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</b>\n"
+            f"<b>  📌 VIDEO</b>\n"
+            f"<b>▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔</b>\n\n"
+            f"  <b>◈ ID</b>    {str(count).zfill(3)}\n"
+            f"  <b>◈ Batch</b> {plain_batch}\n"
+            f"  <b>◈ Title</b> {name1}\n"
+            f"  <b>◈ Ext</b>   {CR}.{ext_actual}\n"
+            f"  <b>◈ Res</b>   {res}\n"
+            f"  <b>◈ Date</b>  {date_str}\n\n"
+            f"<b>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  ◆ {CR}</b>\n"
+        )
+
+    # ---------- MINIMAL DOT ----------
+    elif style == "minimal_dot":
+        return (
+            f"\n<b>• • • • • • • • • • • • • •</b>\n"
+            f"<b>  ▫ VIDEO</b>\n"
+            f"<b>• • • • • • • • • • • • • •</b>\n\n"
+            f"  <b>◉</b> ID    {str(count).zfill(3)}\n"
+            f"  <b>◉</b> Batch {plain_batch}\n"
+            f"  <b>◉</b> Title {name1}\n"
+            f"  <b>◉</b> Ext   {CR}.{ext_actual}\n"
+            f"  <b>◉</b> Res   {res}\n"
+            f"  <b>◉</b> Date  {date_str}\n\n"
+            f"<b>• • • • • • • • • • • • • •</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  {CR}</b>\n"
+        )
+
+    # ---------- MODERN BORDER ----------
+    elif style == "modern_border":
+        return (
+            f"\n<b>┌──────────────────────┐</b>\n"
+            f"<b>│  ★ VIDEO DETAILS</b>\n"
+            f"<b>├──────────────────────┤</b>\n"
+            f"<b>│</b>\n"
+            f"<b>│  ID</b>    {str(count).zfill(3)}\n"
+            f"<b>│  Batch</b> {plain_batch}\n"
+            f"<b>│  Title</b> {name1}\n"
+            f"<b>│  Ext</b>   {CR}.{ext_actual}\n"
+            f"<b>│  Res</b>   {res}\n"
+            f"<b>│  Date</b>  {date_str}\n"
+            f"<b>│</b>\n"
+            f"<b>├──────────────────────┤</b>\n"
+            f"<b>│  {CR}</b>\n"
+            f"<b>└──────────────────────┘</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+
+    # ---------- ULTRA CLEAN ----------
+    elif style == "ultra_clean":
+        return (
+            f"\n<b>── ✦ ── ✦ ── ✦ ──</b>\n"
+            f"<b>  VIDEO</b>\n"
+            f"<b>── ✦ ── ✦ ── ✦ ──</b>\n\n"
+            f"  ID    : {str(count).zfill(3)}\n"
+            f"  Batch : {plain_batch}\n"
+            f"  Title : {name1}\n"
+            f"  Ext   : {CR}.{ext_actual}\n"
+            f"  Res   : {res}\n"
+            f"  Date  : {date_str}\n\n"
+            f"<b>── ✦ ── ✦ ── ✦ ──</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  {CR}</b>\n"
+        )
+
+    # ---------- DEFAULT (FALLBACK) ----------
     else:
         return (
             f"\n<b>🧭 Index ID:</b> {str(count).zfill(3)}\n\n"
@@ -221,6 +491,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
         )
 
 # ========================= SETTINGS SYSTEM =========================
+
 def get_user_settings(user_id: int, bot_username: str = None) -> dict:
     if bot_username is None:
         bot_username = bot.me.username
@@ -268,7 +539,8 @@ async def settings_cmd(client: Client, message: Message):
     user_id = message.from_user.id
     await message.reply_text(
         "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-        reply_markup=settings_menu_markup(user_id)
+        reply_markup=settings_menu_markup(user_id),
+        parse_mode=ParseMode.HTML
     )
 
 @bot.on_callback_query()
@@ -278,36 +550,42 @@ async def settings_callback(client: Client, query: CallbackQuery):
     bot_username = client.me.username
     settings = get_user_settings(user_id, bot_username)
 
+    # ---------- TOGGLE HANDLER (generic) ----------
     if data.endswith("_toggle"):
         key = data.replace("set_", "").replace("_toggle", "")
         current = settings.get(key, False)
-        update_setting(user_id, key, not current, bot_username)
-        await query.answer(f"✅ {key.replace('_',' ').title()} set to {not current}")
+        new_value = not current
+        update_setting(user_id, key, new_value, bot_username)
+        await query.answer(f"✅ {key.replace('_',' ').title()} set to {new_value}")
         await query.message.edit_text(
             "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-            reply_markup=settings_menu_markup(user_id)
+            reply_markup=settings_menu_markup(user_id),
+            parse_mode=ParseMode.HTML
         )
         return
 
+    # ---------- SET DOWNLOADER NAME ----------
     if data == "set_downloader_name":
         await query.answer()
-        msg = await query.message.reply_text("✏️ Send the new name (or /cancel):")
+        msg = await query.message.reply_text("✏️ Send the new name (or /cancel):", parse_mode=ParseMode.HTML)
         try:
             input_msg: Message = await client.listen(msg.chat.id, timeout=30)
             if input_msg.text and input_msg.text != "/cancel":
                 update_setting(user_id, "downloader_name", input_msg.text.strip(), bot_username)
                 await input_msg.delete()
-                await msg.edit_text("✅ Downloader name updated!")
+                await msg.edit_text("✅ Downloader name updated!", parse_mode=ParseMode.HTML)
                 await query.message.edit_text(
                     "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
+                    reply_markup=settings_menu_markup(user_id),
+                    parse_mode=ParseMode.HTML
                 )
             else:
-                await msg.edit_text("❌ Cancelled.")
+                await msg.edit_text("❌ Cancelled.", parse_mode=ParseMode.HTML)
         except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
+            await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
+    # ---------- SET CAPTION STYLE ----------
     if data == "set_caption_style":
         buttons = []
         for style in ALL_STYLES:
@@ -318,7 +596,8 @@ async def settings_callback(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             "🎨 **Select Caption Style:**\n\n"
             "<i>Choose how video captions should look.</i>",
-            reply_markup=InlineKeyboardMarkup(buttons)
+            reply_markup=InlineKeyboardMarkup(buttons),
+            parse_mode=ParseMode.HTML
         )
         return
 
@@ -330,10 +609,12 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await query.answer(f"✅ Caption style set to {display_name}")
             await query.message.edit_text(
                 "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                reply_markup=settings_menu_markup(user_id)
+                reply_markup=settings_menu_markup(user_id),
+                parse_mode=ParseMode.HTML
             )
         return
 
+    # ---------- SET QUALITY ----------
     if data == "set_quality":
         qualities = ["144", "240", "360", "480", "720", "1080"]
         buttons = []
@@ -343,7 +624,8 @@ async def settings_callback(client: Client, query: CallbackQuery):
         buttons.append([InlineKeyboardButton("🔙 Back", callback_data="main_menu")])
         await query.message.edit_text(
             "📐 **Select Upload Quality:**",
-            reply_markup=InlineKeyboardMarkup(buttons)
+            reply_markup=InlineKeyboardMarkup(buttons),
+            parse_mode=ParseMode.HTML
         )
         return
 
@@ -355,82 +637,91 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await query.answer(f"Quality set to {q}p")
             await query.message.edit_text(
                 "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                reply_markup=settings_menu_markup(user_id)
+                reply_markup=settings_menu_markup(user_id),
+                parse_mode=ParseMode.HTML
             )
         return
 
+    # ---------- SET THUMBNAIL ----------
     if data == "set_thumbnail":
         await query.answer()
-        msg = await query.message.reply_text("🖼️ Send a photo, /default, or /cancel:")
+        msg = await query.message.reply_text("🖼️ Send a photo, /default, or /cancel:", parse_mode=ParseMode.HTML)
         try:
             input_msg: Message = await client.listen(msg.chat.id, timeout=30)
             if input_msg.photo:
                 file_path = f"downloads/thumb_{user_id}.jpg"
                 await client.download_media(input_msg.photo, file_name=file_path)
                 update_setting(user_id, "thumbnail", file_path, bot_username)
-                await msg.edit_text("✅ Thumbnail updated!")
+                await msg.edit_text("✅ Thumbnail updated!", parse_mode=ParseMode.HTML)
                 await query.message.edit_text(
                     "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
+                    reply_markup=settings_menu_markup(user_id),
+                    parse_mode=ParseMode.HTML
                 )
             elif input_msg.text == "/default":
                 update_setting(user_id, "thumbnail", "default", bot_username)
-                await msg.edit_text("✅ Reset to default.")
+                await msg.edit_text("✅ Reset to default.", parse_mode=ParseMode.HTML)
                 await query.message.edit_text(
                     "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
+                    reply_markup=settings_menu_markup(user_id),
+                    parse_mode=ParseMode.HTML
                 )
             elif input_msg.text == "/cancel":
-                await msg.edit_text("❌ Cancelled.")
+                await msg.edit_text("❌ Cancelled.", parse_mode=ParseMode.HTML)
             else:
-                await msg.edit_text("❌ Invalid input.")
+                await msg.edit_text("❌ Invalid input.", parse_mode=ParseMode.HTML)
         except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
+            await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
+    # ---------- SET PW TOKEN ----------
     if data == "set_pw_token":
         await query.answer()
-        msg = await query.message.reply_text("🔑 Send new PW token (or /cancel):")
+        msg = await query.message.reply_text("🔑 Send new PW token (or /cancel):", parse_mode=ParseMode.HTML)
         try:
             input_msg: Message = await client.listen(msg.chat.id, timeout=30)
             if input_msg.text and input_msg.text != "/cancel":
                 update_setting(user_id, "pw_token", input_msg.text.strip(), bot_username)
-                await msg.edit_text("✅ PW Token updated!")
+                await msg.edit_text("✅ PW Token updated!", parse_mode=ParseMode.HTML)
                 await query.message.edit_text(
                     "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
+                    reply_markup=settings_menu_markup(user_id),
+                    parse_mode=ParseMode.HTML
                 )
             else:
-                await msg.edit_text("❌ Cancelled.")
+                await msg.edit_text("❌ Cancelled.", parse_mode=ParseMode.HTML)
         except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
+            await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
+    # ---------- SET PROXY ----------
     if data == "set_proxy":
         await query.answer()
-        msg = await query.message.reply_text("🌐 Send proxy URL (or /cancel):")
+        msg = await query.message.reply_text("🌐 Send proxy URL (or /cancel):", parse_mode=ParseMode.HTML)
         try:
             input_msg: Message = await client.listen(msg.chat.id, timeout=30)
             if input_msg.text and input_msg.text != "/cancel":
                 update_setting(user_id, "proxy", input_msg.text.strip(), bot_username)
-                await msg.edit_text("✅ Proxy updated!")
+                await msg.edit_text("✅ Proxy updated!", parse_mode=ParseMode.HTML)
                 await query.message.edit_text(
                     "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                    reply_markup=settings_menu_markup(user_id)
+                    reply_markup=settings_menu_markup(user_id),
+                    parse_mode=ParseMode.HTML
                 )
             else:
-                await msg.edit_text("❌ Cancelled.")
+                await msg.edit_text("❌ Cancelled.", parse_mode=ParseMode.HTML)
         except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
+            await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
+    # ---------- DATABASE INFO ----------
     if data == "set_db_info":
         try:
             status = "✅ Connected" if db.client is not None else "❌ Disconnected"
             await query.answer(f"Database: {status}")
-            await query.message.reply_text(f"📊 **Database Status**\n\nStatus: {status}\nDatabase: {DATABASE_NAME}")
+            await query.message.reply_text(f"📊 **Database Status**\n\nStatus: {status}\nDatabase: {DATABASE_NAME}", parse_mode=ParseMode.HTML)
         except Exception as e:
-            await query.message.reply_text(f"❌ DB Error: {str(e)}")
+            await query.message.reply_text(f"❌ DB Error: {str(e)}", parse_mode=ParseMode.HTML)
         return
 
     # ========== SUBJECT GROUP MANAGEMENT ==========
@@ -450,38 +741,39 @@ async def settings_callback(client: Client, query: CallbackQuery):
             [InlineKeyboardButton("📌 Set Default Group", callback_data="set_default_group")],
             [InlineKeyboardButton("🔙 Back", callback_data="main_menu")]
         ]
-        await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(buttons))
+        await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
         return
 
     if data == "add_subject_group":
         await query.answer()
-        msg = await query.message.reply_text("✏️ Send **Subject Name** (e.g., 'Mathematics'):")
+        msg = await query.message.reply_text("✏️ Send **Subject Name** (e.g., 'Mathematics'):", parse_mode=ParseMode.HTML)
         try:
             input1: Message = await client.listen(msg.chat.id, timeout=30)
             if not input1.text or input1.text == "/cancel":
-                await msg.edit_text("❌ Cancelled.")
+                await msg.edit_text("❌ Cancelled.", parse_mode=ParseMode.HTML)
                 return
             subject = input1.text.strip()
             await input1.delete()
-            await msg.edit_text(f"📤 Now send the **Chat ID** (or forward a message):")
+            await msg.edit_text(f"📤 Now send the **Chat ID** (or forward a message):", parse_mode=ParseMode.HTML)
             input2: Message = await client.listen(msg.chat.id, timeout=30)
             if input2.forward_from_chat:
                 chat_id = input2.forward_from_chat.id
             elif input2.text and input2.text.lstrip('-').isdigit():
                 chat_id = int(input2.text.strip())
             else:
-                await msg.edit_text("❌ Invalid chat ID.")
+                await msg.edit_text("❌ Invalid chat ID.", parse_mode=ParseMode.HTML)
                 return
             if db.add_subject_group(user_id, bot_username, subject, chat_id):
-                await msg.edit_text(f"✅ Added: {subject} → `{chat_id}`")
+                await msg.edit_text(f"✅ Added: {subject} → `{chat_id}`", parse_mode=ParseMode.HTML)
             else:
-                await msg.edit_text("❌ Failed.")
+                await msg.edit_text("❌ Failed.", parse_mode=ParseMode.HTML)
             await query.message.edit_text(
                 "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                reply_markup=settings_menu_markup(user_id)
+                reply_markup=settings_menu_markup(user_id),
+                parse_mode=ParseMode.HTML
             )
         except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
+            await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
     if data == "remove_subject_group":
@@ -493,7 +785,7 @@ async def settings_callback(client: Client, query: CallbackQuery):
         for subject in groups.keys():
             buttons.append([InlineKeyboardButton(f"🗑️ {subject}", callback_data=f"remove_group_{subject}")])
         buttons.append([InlineKeyboardButton("🔙 Back", callback_data="set_subject_groups")])
-        await query.message.edit_text("Select subject to remove:", reply_markup=InlineKeyboardMarkup(buttons))
+        await query.message.edit_text("Select subject to remove:", reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
         return
 
     if data.startswith("remove_group_"):
@@ -504,13 +796,14 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await query.answer("Failed.")
         await query.message.edit_text(
             "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-            reply_markup=settings_menu_markup(user_id)
+            reply_markup=settings_menu_markup(user_id),
+            parse_mode=ParseMode.HTML
         )
         return
 
     if data == "set_default_group":
         await query.answer()
-        msg = await query.message.reply_text("📌 Send Chat ID (or forward):")
+        msg = await query.message.reply_text("📌 Send Chat ID (or forward):", parse_mode=ParseMode.HTML)
         try:
             input_msg: Message = await client.listen(msg.chat.id, timeout=30)
             if input_msg.forward_from_chat:
@@ -518,24 +811,27 @@ async def settings_callback(client: Client, query: CallbackQuery):
             elif input_msg.text and input_msg.text.lstrip('-').isdigit():
                 chat_id = int(input_msg.text.strip())
             else:
-                await msg.edit_text("❌ Invalid.")
+                await msg.edit_text("❌ Invalid.", parse_mode=ParseMode.HTML)
                 return
             if db.set_default_group(user_id, bot_username, chat_id):
-                await msg.edit_text(f"✅ Default group set to `{chat_id}`")
+                await msg.edit_text(f"✅ Default group set to `{chat_id}`", parse_mode=ParseMode.HTML)
             else:
-                await msg.edit_text("❌ Failed.")
+                await msg.edit_text("❌ Failed.", parse_mode=ParseMode.HTML)
             await query.message.edit_text(
                 "⚙️ **Settings Menu**\n\nChoose an option to modify:",
-                reply_markup=settings_menu_markup(user_id)
+                reply_markup=settings_menu_markup(user_id),
+                parse_mode=ParseMode.HTML
             )
         except asyncio.TimeoutError:
-            await msg.edit_text("⏰ Timeout.")
+            await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
+    # ---------- MAIN MENU BACK ----------
     if data == "main_menu":
         await query.message.edit_text(
             "⚙️ **Settings Menu**\n\nChoose an option:",
-            reply_markup=settings_menu_markup(user_id)
+            reply_markup=settings_menu_markup(user_id),
+            parse_mode=ParseMode.HTML
         )
         return
 
@@ -543,6 +839,7 @@ async def settings_callback(client: Client, query: CallbackQuery):
 
 # ========================= END SETTINGS SYSTEM =========================
 
+# ========================= OTHER COMMANDS =========================
 @bot.on_message(filters.command("setlog") & filters.private)
 async def set_log_channel_cmd(client: Client, message: Message):
     try:
@@ -586,13 +883,11 @@ api_url = "http://master-api-v3.vercel.app/"
 api_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzkxOTMzNDE5NSIsInRnX3VzZXJuYW1lIjoi4p61IFtvZmZsaW5lXSIsImlhdCI6MTczODY5MjA3N30.SXzZ1MZcvMp5sGESj0hBKSghhxJ3k1GTWoBUbivUe1I"
 cwtoken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NTExOTcwNjQsImNvbiI6eyJpc0FkbWluIjpmYWxzZSwiYXVzZXIiOiJVMFZ6TkdGU2NuQlZjR3h5TkZwV09FYzBURGxOZHowOSIsImlkIjoiVWtoeVRtWkhNbXRTV0RjeVJIcEJUVzExYUdkTlp6MDkiLCJmaXJzdF9uYW1lIjoiVWxadVFXaFBaMnAwSzJsclptVXpkbGxXT0djMkREWlRZVFZ5YzNwdldXNXhhVEpPWjFCWFYyd3pWVDA9IiwiZW1haWwiOiJWSGgyWjB0d2FUZFdUMVZYYmxoc2FsZFJSV2xrY0RWM2FGSkRSU3RzV0c5M1pDOW1hR0kxSzBOeVRUMD0iLCJwaG9uZSI6IldGcFZSSFZOVDJFeGNFdE9Oak4zUzJocmVrNHdRVDA5IiwiYXZhdGFyIjoiSzNWc2NTOHpTMHAwUW5sa2JrODNSRGx2ZWtOaVVUMDkiLCJyZWZlcnJhbF9jb2RlIjoiWkdzMlpUbFBORGw2Tm5OclMyVTRiRVIxTkVWb1FUMDkiLCJkZXZpY2VfdHlwZSI6ImFuZHJvaWQiLCJkZXZpY2VfdmVyc2lvbiI6IlEoQW5kcm9pZCAxMC4wKSIsImRldmljZV9tb2RlbCI6IlhpYW9taSBNMjAwN0oyMENJIiwicmVtb3RlX2FkZHIiOiI0NC4yMDIuMTkzLjIyMCJ9fQ.ONBsbnNwCQQtKMK2h18LCi73e90s2Cr63ZaIHtYueM-Gt5Z4sF6Ay-SEaKaIf1ir9ThflrtTdi5eFkUGIcI78R1stUUch_GfBXZsyg7aVyH2wxm9lKsFB2wK3qDgpd0NiBoT-ZsTrwzlbwvCFHhMp9rh83D4kZIPPdbp5yoA_06L0Zr4fNq3S328G8a8DtboJFkmxqG2T1yyVE2wLIoR3b8J3ckWTlT_VY2CCx8RjsstoTrkL8e9G5ZGa6sksMb93ugautin7GKz-nIz27pCr0h7g9BCoQWtL69mVC5xvVM3Z324vo5uVUPBi1bCG-ptpD9GWQ4exOBk9fJvGo-vRg"
 
-# ⭐ NEW PHOTO URL
 photologo = 'https://files.catbox.moe/4pbjt9.jpg'
 photoyt = 'https://tinypic.host/images/2025/03/18/YouTube-Logo.wine.png'
 photocp = 'https://tinypic.host/images/2025/03/28/IMG_20250328_133126.jpg'
 photozip = 'https://envs.sh/fH.jpg/IMG20250803719.jpg'
 
-# Inline keyboards
 BUTTONSCONTACT = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url="https://t.me/Helpbykrishna2_bot")]])
 keyboard = InlineKeyboardMarkup(
     [
@@ -608,32 +903,32 @@ image_urls = [
 
 @bot.on_message(filters.command("cookies") & filters.private)
 async def cookies_handler(client: Client, m: Message):
-    await m.reply_text("Please upload the cookies file (.txt).", quote=True)
+    await m.reply_text("Please upload the cookies file (.txt).", quote=True, parse_mode=ParseMode.HTML)
     try:
         input_message: Message = await client.listen(m.chat.id)
         if not input_message.document or not input_message.document.file_name.endswith(".txt"):
-            await m.reply_text("Invalid file type.")
+            await m.reply_text("Invalid file type.", parse_mode=ParseMode.HTML)
             return
         downloaded_path = await input_message.download()
         with open(downloaded_path, "r") as f:
             cookies_content = f.read()
         with open(cookies_file_path, "w") as f:
             f.write(cookies_content)
-        await input_message.reply_text("✅ Cookies updated.")
+        await input_message.reply_text("✅ Cookies updated.", parse_mode=ParseMode.HTML)
     except Exception as e:
-        await m.reply_text(f"⚠️ Error: {str(e)}")
+        await m.reply_text(f"⚠️ Error: {str(e)}", parse_mode=ParseMode.HTML)
 
 @bot.on_message(filters.command(["t2t"]))
 async def text_to_txt(client, message: Message):
     user_id = str(message.from_user.id)
-    editable = await message.reply_text("Send text data:")
+    editable = await message.reply_text("Send text data:", parse_mode=ParseMode.HTML)
     input_message: Message = await bot.listen(message.chat.id)
     if not input_message.text:
-        await message.reply_text("Send valid text.")
+        await message.reply_text("Send valid text.", parse_mode=ParseMode.HTML)
         return
     text_data = input_message.text.strip()
     await input_message.delete()
-    await editable.edit("Send file name or /d for default:")
+    await editable.edit("Send file name or /d for default:", parse_mode=ParseMode.HTML)
     inputn: Message = await bot.listen(message.chat.id)
     raw_textn = inputn.text
     await inputn.delete()
@@ -646,24 +941,24 @@ async def text_to_txt(client, message: Message):
     os.makedirs(os.path.dirname(txt_file), exist_ok=True)
     with open(txt_file, 'w') as f:
         f.write(text_data)
-    await message.reply_document(document=txt_file, caption=f"`{custom_file_name}.txt`")
+    await message.reply_document(document=txt_file, caption=f"`{custom_file_name}.txt`", parse_mode=ParseMode.HTML)
     os.remove(txt_file)
 
 @bot.on_message(filters.command("getcookies") & filters.private)
 async def getcookies_handler(client: Client, m: Message):
     try:
-        await client.send_document(chat_id=m.chat.id, document=cookies_file_path, caption="Here is the cookies file.")
+        await client.send_document(chat_id=m.chat.id, document=cookies_file_path, caption="Here is the cookies file.", parse_mode=ParseMode.HTML)
     except Exception as e:
-        await m.reply_text(f"⚠️ Error: {str(e)}")
+        await m.reply_text(f"⚠️ Error: {str(e)}", parse_mode=ParseMode.HTML)
 
 @bot.on_message(filters.command(["stop"]))
 async def restart_handler(_, m):
-    await m.reply_text("🚦 **STOPPED**", True)
+    await m.reply_text("🚦 **STOPPED**", True, parse_mode=ParseMode.HTML)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 # ======================== START COMMAND ========================
 @bot.on_message(filters.command("start") & (filters.private | filters.channel))
-async def start(bot: Client, m: Message):
+async def start_cmd(bot: Client, m: Message):
     try:
         if m.chat.type == "channel":
             if not db.is_channel_authorized(m.chat.id, bot.me.username):
@@ -673,7 +968,8 @@ async def start(bot: Client, m: Message):
                 "**Available Commands:**\n"
                 "• /drm - Download DRM videos\n"
                 "• /plan - View channel subscription\n\n"
-                "Send these commands in the channel to use them."
+                "Send these commands in the channel to use them.",
+                parse_mode=ParseMode.HTML
             )
         else:
             is_authorized = db.is_user_authorized(m.from_user.id, bot.me.username)
@@ -689,7 +985,8 @@ async def start(bot: Client, m: Message):
                     reply_markup=InlineKeyboardMarkup([
                         [InlineKeyboardButton("📞 Contact Admin", url="https://t.me/Helpbykrishna2_bot")],
                         [InlineKeyboardButton("ℹ️ Features", callback_data="help")]
-                    ])
+                    ]),
+                    parse_mode=ParseMode.HTML
                 )
                 return
             
@@ -721,7 +1018,8 @@ async def start(bot: Client, m: Message):
                     [InlineKeyboardButton("📞 Contact", url="https://t.me/Helpbykrishna2_bot")],
                     [InlineKeyboardButton("ℹ️ Features", callback_data="help"),
                      InlineKeyboardButton("📊 Plan", callback_data="plan")]
-                ])
+                ]),
+                parse_mode=ParseMode.HTML
             )
     except Exception as e:
         print(f"Error in start: {str(e)}")
@@ -736,8 +1034,9 @@ def auth_check_filter(_, client, message):
         return False
 
 auth_filter = filters.create(auth_check_filter)
+not_auth_filter = filters.create(lambda _, client, message: not auth_check_filter(_, client, message))
 
-@bot.on_message(~auth_filter & filters.private & filters.command)
+@bot.on_message(not_auth_filter & filters.private & filters.command)
 async def unauthorized_handler(client, message: Message):
     await message.reply(
         "<b>Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/DRM_Wizardbot)</b>\n\n"
@@ -745,62 +1044,65 @@ async def unauthorized_handler(client, message: Message):
         "Please contact admin to get premium access.</blockquote>",
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton("💫 Get Premium Access", url="https://t.me/Helpbykrishna2_bot")
-        ]])
+        ]]),
+        parse_mode=ParseMode.HTML
     )
 
 @bot.on_message(filters.command(["id"]))
 async def id_command(client, message: Message):
     chat_id = message.chat.id
-    await message.reply_text(f"<blockquote>The ID of this chat id is:</blockquote>\n`{chat_id}`")
+    await message.reply_text(f"<blockquote>The ID of this chat id is:</blockquote>\n`{chat_id}`", parse_mode=ParseMode.HTML)
 
 @bot.on_message(filters.command(["t2h"]))
 async def call_html_handler(bot: Client, message: Message):
-    await html_handler(bot, message)
+    await bot.send_message(message.chat.id, "📂 Please upload a .txt file to convert to HTML. Use /html command.", parse_mode=ParseMode.HTML)
 
 @bot.on_message(filters.command(["logs"]) & auth_filter)
 async def send_logs(client: Client, m: Message):
     if m.chat.type == "channel":
-        if not db.is_channel_authorized(m.chat.id, bot_username):
+        if not db.is_channel_authorized(m.chat.id, client.me.username):
             return
     else:
-        if not db.is_user_authorized(m.from_user.id, bot_username):
-            await m.reply_text("❌ Not authorized.")
+        if not db.is_user_authorized(m.from_user.id, client.me.username):
+            await m.reply_text("❌ Not authorized.", parse_mode=ParseMode.HTML)
             return
     try:
         with open("logs.txt", "rb") as file:
-            sent = await m.reply_text("**📤 Sending logs...**")
+            sent = await m.reply_text("**📤 Sending logs...**", parse_mode=ParseMode.HTML)
             await m.reply_document(document=file)
             await sent.delete()
     except Exception as e:
-        await m.reply_text(f"**Error:** {e}")
+        await m.reply_text(f"**Error:** {e}", parse_mode=ParseMode.HTML)
 
-# ========================= MAIN DRM HANDLER – MODIFIED =========================
+# ========================= MAIN DRM HANDLER (BATCH) – MODIFIED =========================
 @bot.on_message(filters.command(["drm"]) & auth_filter)
 async def txt_handler(bot: Client, m: Message):
-    # ===== AUTHORIZATION =====
+    # Get bot username
     bot_info = await bot.get_me()
     bot_username = bot_info.username
 
+    # Check authorization
     if m.chat.type == "channel":
         if not db.is_channel_authorized(m.chat.id, bot_username):
             return
     else:
         if not db.is_user_authorized(m.from_user.id, bot_username):
-            await m.reply_text("❌ Not authorized.")
+            await m.reply_text("❌ Not authorized.", parse_mode=ParseMode.HTML)
             return
 
     editable = await m.reply_text(
         "__Hii, I am DRM Downloader Bot__\n"
         "<blockquote><i>Send Me Your text file which include Name: Link\n</i></blockquote>"
-        "<blockquote><i>All inputs auto-taken in 20 sec</i></blockquote>"
+        "<blockquote><i>All inputs auto-taken in 20 sec</i></blockquote>",
+        parse_mode=ParseMode.HTML
     )
     input_msg: Message = await bot.listen(editable.chat.id)
 
     if not input_msg.document:
-        await m.reply_text("❌ Please send a text file!")
+        await m.reply_text("❌ Please send a text file!", parse_mode=ParseMode.HTML)
         return
     if not input_msg.document.file_name.endswith('.txt'):
-        await m.reply_text("❌ Please send a .txt file!")
+        await m.reply_text("❌ Please send a .txt file!", parse_mode=ParseMode.HTML)
         return
 
     x = await input_msg.download()
@@ -809,7 +1111,7 @@ async def txt_handler(bot: Client, m: Message):
     file_name, ext = os.path.splitext(os.path.basename(x))
     path = f"./downloads/{m.chat.id}"
 
-    # ===== PARSE FILE – EXTRACT FOLDER FROM [SUBJECT] =====
+    # ========== PARSE FILE & GROUP BY FOLDER (from [Subject]) ==========
     folders = {}
     all_links_count = 0
     pdf_count = img_count = v2_count = mpd_count = m3u8_count = yt_count = drm_count = zip_count = other_count = 0
@@ -849,12 +1151,12 @@ async def txt_handler(bot: Client, m: Message):
                 elif "zip" in url: zip_count += 1
                 else: other_count += 1
     except Exception as e:
-        await m.reply_text(f"Error reading file: {e}")
+        await m.reply_text(f"Error reading file: {e}", parse_mode=ParseMode.HTML)
         os.remove(x)
         return
 
     if not folders:
-        await m.reply_text("No valid links found.")
+        await m.reply_text("No valid links found.", parse_mode=ParseMode.HTML)
         os.remove(x)
         return
 
@@ -867,7 +1169,8 @@ async def txt_handler(bot: Client, m: Message):
         f"ZIP: {zip_count}   DRM: {drm_count}   M3U8: {m3u8_count}\n"
         f"MPD: {mpd_count}   YT: {yt_count}\n"
         f"Others: {other_count}\n\n"
-        f"Send Index ID between 1-{all_links_count}:"
+        f"Send Index ID between 1-{all_links_count}:",
+        parse_mode=ParseMode.HTML
     )
 
     chat_id = editable.chat.id
@@ -881,11 +1184,11 @@ async def txt_handler(bot: Client, m: Message):
 
     start_index = int(raw_text) - 1
     if start_index < 0 or start_index >= all_links_count:
-        await editable.edit(f"Enter number in range 1-{all_links_count}")
+        await editable.edit(f"Enter number in range 1-{all_links_count}", parse_mode=ParseMode.HTML)
         return
 
     # ===== ASK FOR BATCH INFO (same as original) =====
-    await editable.edit("1. Enter Batch Name\n2. Send /d for default")
+    await editable.edit("1. Enter Batch Name\n2. Send /d for default", parse_mode=ParseMode.HTML)
     try:
         input1: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_text0 = input1.text
@@ -894,7 +1197,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_text0 = '/d'
     b_name = file_name.replace('_', ' ') if raw_text0 == '/d' else raw_text0
 
-    await editable.edit("Enter Topic Name (or /d for default):")
+    await editable.edit("Enter Topic Name (or /d for default):", parse_mode=ParseMode.HTML)
     try:
         input_topic: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_topic = input_topic.text
@@ -903,7 +1206,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_topic = '/d'
     topic = "General" if raw_topic == '/d' else raw_topic
 
-    await editable.edit("Enter Subject Name (or /d for default):")
+    await editable.edit("Enter Subject Name (or /d for default):", parse_mode=ParseMode.HTML)
     try:
         input_subject: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_subject = input_subject.text
@@ -912,7 +1215,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_subject = '/d'
     subject = "General" if raw_subject == '/d' else raw_subject
 
-    await editable.edit("Enter resolution:\n144/240/360/480/720/1080")
+    await editable.edit("Enter resolution:\n144/240/360/480/720/1080", parse_mode=ParseMode.HTML)
     try:
         input2: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_text2 = input2.text
@@ -925,7 +1228,7 @@ async def txt_handler(bot: Client, m: Message):
     except:
         res = "UN"
 
-    await editable.edit("Send watermark text or /d for none")
+    await editable.edit("Send watermark text or /d for none", parse_mode=ParseMode.HTML)
     try:
         inputx: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_textx = inputx.text
@@ -935,7 +1238,7 @@ async def txt_handler(bot: Client, m: Message):
     global watermark
     watermark = "/d" if raw_textx == '/d' else raw_textx
 
-    await editable.edit("Send credit name or /d for default")
+    await editable.edit("Send credit name or /d for default", parse_mode=ParseMode.HTML)
     try:
         input3: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_text3 = input3.text
@@ -949,7 +1252,7 @@ async def txt_handler(bot: Client, m: Message):
     else:
         CR = raw_text3
 
-    await editable.edit("Send PW token or /d")
+    await editable.edit("Send PW token or /d", parse_mode=ParseMode.HTML)
     try:
         input4: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
         raw_text4 = input4.text
@@ -957,7 +1260,7 @@ async def txt_handler(bot: Client, m: Message):
     except asyncio.TimeoutError:
         raw_text4 = '/d'
 
-    await editable.edit("Send photo for thumbnail, /d for default, /skip to skip")
+    await editable.edit("Send photo for thumbnail, /d for default, /skip to skip", parse_mode=ParseMode.HTML)
     thumb = "/d"
     try:
         input6 = await bot.listen(chat_id=m.chat.id, timeout=timeout_duration)
@@ -968,7 +1271,7 @@ async def txt_handler(bot: Client, m: Message):
             try:
                 await bot.download_media(message=input6.photo, file_name=temp_file)
                 thumb = temp_file
-                await editable.edit("✅ Custom thumbnail saved")
+                await editable.edit("✅ Custom thumbnail saved", parse_mode=ParseMode.HTML)
                 await asyncio.sleep(1)
             except Exception as e:
                 print(f"Thumb error: {e}")
@@ -993,10 +1296,10 @@ async def txt_handler(bot: Client, m: Message):
         try:
             bot_member = await bot.get_chat_member(channel_id, bot.me.id)
             if bot_member.status not in ["administrator", "creator"]:
-                await editable.edit("⚠️ I am not admin in this chat. Please make me admin to upload.")
+                await editable.edit("⚠️ I am not admin in this chat. Please make me admin to upload.", parse_mode=ParseMode.HTML)
                 return
         except Exception as e:
-            await editable.edit(f"⚠️ Could not verify admin status: {str(e)}")
+            await editable.edit(f"⚠️ Could not verify admin status: {str(e)}", parse_mode=ParseMode.HTML)
             return
 
     # ===== AUTO-TOPIC PER FOLDER =====
@@ -1013,14 +1316,14 @@ async def txt_handler(bot: Client, m: Message):
                     topic_title = f"{folder} - {b_name}" if b_name else folder
                     topic = await bot.create_forum_topic(channel_id, title=topic_title[:100])
                     folder_topics[folder] = topic.id
-                    await editable.edit(f"✅ Topic created: {topic_title[:50]}")
+                    await editable.edit(f"✅ Topic created: {topic_title[:50]}", parse_mode=ParseMode.HTML)
                 main_topic = await bot.create_forum_topic(channel_id, title=f"📊 Summary - {b_name[:80]}")
                 main_topic_id = main_topic.id
             else:
-                await editable.edit("ℹ️ Auto‑topic only works in supergroups. Skipping.")
+                await editable.edit("ℹ️ Auto‑topic only works in supergroups. Skipping.", parse_mode=ParseMode.HTML)
                 auto_topic = False
         except Exception as e:
-            await editable.edit(f"⚠️ Failed to create topics: {str(e)}")
+            await editable.edit(f"⚠️ Failed to create topics: {str(e)}", parse_mode=ParseMode.HTML)
             auto_topic = False
 
     await editable.delete()
@@ -1043,7 +1346,7 @@ async def txt_handler(bot: Client, m: Message):
     for folder, title, url in items_to_process:
         topic_id = folder_topics.get(folder) if auto_topic else None
 
-        # ---- Prepare name (same as original) ----
+        # ---- Prepare name (exactly as original) ----
         name1 = title.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
         if "," in raw_text3:
             name = f'{PRENAME} {name1[:60]}'
@@ -1051,7 +1354,6 @@ async def txt_handler(bot: Client, m: Message):
             name = f'{name1[:60]}'
 
         # ---- URL transformations (copy your ENTIRE original block here) ----
-        # I am including the full block from your original code – it's long but must be exactly as you had.
         Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = "https://" + Vxy
         link0 = "https://" + Vxy
@@ -1196,7 +1498,7 @@ async def txt_handler(bot: Client, m: Message):
                 ka = await helper.download(url, name)
                 ext_actual = "pdf"
                 cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
-                await bot.send_document(chat_id=channel_id, document=ka, caption=cc, message_thread_id=topic_id)
+                await bot.send_document(chat_id=channel_id, document=ka, caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 count += 1
                 os.remove(ka)
                 continue
@@ -1217,7 +1519,7 @@ async def txt_handler(bot: Client, m: Message):
                                     file.write(response.content)
                                 ext_actual = "pdf"
                                 cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
-                                await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_id)
+                                await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                                 count += 1
                                 os.remove(f'{name}.pdf')
                                 success = True
@@ -1225,7 +1527,7 @@ async def txt_handler(bot: Client, m: Message):
                         except Exception as e:
                             await asyncio.sleep(retry_delay)
                     if not success:
-                        await m.reply_text(f"Failed to download PDF after retries.")
+                        await m.reply_text(f"Failed to download PDF after retries.", parse_mode=ParseMode.HTML)
                         failed_count += 1
                         count += 1
                         continue
@@ -1235,7 +1537,7 @@ async def txt_handler(bot: Client, m: Message):
                     os.system(download_cmd)
                     ext_actual = "pdf"
                     cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
-                    await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_id)
+                    await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                     count += 1
                     os.remove(f'{name}.pdf')
                 continue
@@ -1245,7 +1547,7 @@ async def txt_handler(bot: Client, m: Message):
                 time.sleep(1)
                 ext_actual = "html"
                 cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
-                await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, message_thread_id=topic_id)
+                await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 os.remove(f'{name}.html')
                 count += 1
                 continue
@@ -1255,7 +1557,7 @@ async def txt_handler(bot: Client, m: Message):
                 cmd = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
                 os.system(cmd)
                 cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
-                await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_id)
+                await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 count += 1
                 os.remove(f'{name}.{ext_actual}')
                 continue
@@ -1265,14 +1567,14 @@ async def txt_handler(bot: Client, m: Message):
                 cmd = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
                 os.system(cmd)
                 cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
-                await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_id)
+                await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 os.remove(f'{name}.{ext_actual}')
                 count += 1
                 continue
 
             elif 'encrypted.m' in url:
                 Show = f"<i><b>⚡ Video APPX Encrypted Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
-                prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
+                prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True, message_thread_id=topic_id)
                 try:
                     res_file = await helper.download_and_decrypt_video(url, cmd, name, appxkey)
                     filename = res_file
@@ -1283,19 +1585,19 @@ async def txt_handler(bot: Client, m: Message):
                         await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
                         count += 1
                     else:
-                        await bot.send_message(channel_id, f'⚠️ Failed to decrypt.', message_thread_id=topic_id)
+                        await bot.send_message(channel_id, f'⚠️ Failed to decrypt.', parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                         failed_count += 1
                         count += 1
                         continue
                 except Exception as e:
-                    await bot.send_message(channel_id, f'⚠️ Error: {str(e)}', message_thread_id=topic_id)
+                    await bot.send_message(channel_id, f'⚠️ Error: {str(e)}', parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                     failed_count += 1
                     count += 1
                     continue
 
             elif 'drmcdni' in url or 'drm/wv' in url:
                 Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
-                prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
+                prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True, message_thread_id=topic_id)
                 res_file = await helper.decrypt_and_merge_video(mpd, keys_string, path, name, raw_text2)
                 filename = res_file
                 await prog.delete(True)
@@ -1308,7 +1610,7 @@ async def txt_handler(bot: Client, m: Message):
 
             else:
                 Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
-                prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
+                prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True, message_thread_id=topic_id)
                 res_file = await helper.download_video(url, cmd, name)
                 filename = res_file
                 await prog.delete(True)
@@ -1319,7 +1621,7 @@ async def txt_handler(bot: Client, m: Message):
                 time.sleep(1)
 
         except Exception as e:
-            await bot.send_message(channel_id, f'⚠️ Download Failed: {str(e)}', message_thread_id=topic_id)
+            await bot.send_message(channel_id, f'⚠️ Download Failed: {str(e)}', parse_mode=ParseMode.HTML, message_thread_id=topic_id)
             failed_count += 1
             count += 1
             continue
@@ -1339,15 +1641,16 @@ async def txt_handler(bot: Client, m: Message):
     )
 
     if auto_topic and main_topic_id:
-        await bot.send_message(channel_id, summary, message_thread_id=main_topic_id)
+        await bot.send_message(channel_id, summary, parse_mode=ParseMode.HTML, message_thread_id=main_topic_id)
     else:
-        await bot.send_message(channel_id, summary)
+        await bot.send_message(channel_id, summary, parse_mode=ParseMode.HTML)
 
-# ========================= SINGLE LINK HANDLER (unchanged) =========================
+# ========================= SINGLE LINK HANDLER =========================
 @bot.on_message(filters.text & filters.private)
 async def text_handler(bot: Client, m: Message):
     if m.from_user.is_bot:
         return
+    # Ignore commands
     if m.text and m.text.startswith('/'):
         return
     links = m.text
@@ -1356,10 +1659,10 @@ async def text_handler(bot: Client, m: Message):
         return
     link = match.group(0)
 
-    editable = await m.reply_text("Processing link...")
+    editable = await m.reply_text("Processing link...", parse_mode=ParseMode.HTML)
     await m.delete()
 
-    await editable.edit("Enter resolution (144/240/360/480/720/1080):")
+    await editable.edit("Enter resolution (144/240/360/480/720/1080):", parse_mode=ParseMode.HTML)
     try:
         input2: Message = await bot.listen(editable.chat.id, timeout=20)
         raw_text2 = input2.text
@@ -1383,9 +1686,99 @@ async def text_handler(bot: Client, m: Message):
         name1 = links.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
         name = f'{name1[:60]}'
 
-        # ---- URL transformations (same as above, copy if needed, but original text_handler already has it) ----
-        # I'm not repeating the full block here for brevity; it's the same as in the batch handler.
-        # You already have it in your original file.
+        # Apply transformations (same as batch)
+        if "visionias" in url:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
+                    text = await resp.text()
+                    url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
+        if "acecwply" in url:
+            cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
+        elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split(".mkv")[0] + ".mkv"
+            if "static-trans-v1.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v1.classx.co.in", "https://appx-transcoded-videos-mcdn.akamai.net.in")
+            elif "static-trans-v2.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v2.classx.co.in", "https://transcoded-videos-v2.classx.co.in")
+            url = f"{base_clean}*{signature}"
+        elif "https://static-rec.classx.co.in/drm/" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split("?")[0]
+            base_clean = base_clean.replace("https://static-rec.classx.co.in", "https://appx-recordings-mcdn.akamai.net.in")
+            url = f"{base_clean}*{signature}"
+        elif "https://static-wsb.classx.co.in/" in url:
+            clean_url = url.split("?")[0]
+            clean_url = clean_url.replace("https://static-wsb.classx.co.in", "https://appx-wsb-gcp-mcdn.akamai.net.in")
+            url = clean_url
+        elif "https://static-db.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+        elif "https://static-db-v2.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+        elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+            url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
+            url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            mpd, keys = helper.get_mps_and_keys(url)
+            url = mpd
+            keys_string = " ".join([f"--key {key}" for key in keys])
+        elif "classplusapp" in url:
+            signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            response = requests.get(signed_api, timeout=40)
+            url = response.json()['url']
+        elif "tencdn.classplusapp" in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+        elif 'videos.classplusapp' in url:
+            url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{raw_text4}'}).json()['url']
+        elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+        elif "childId" in url and "parentId" in url:
+            url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={raw_text4}"
+        if "edge.api.brightcove.com" in url:
+            bcov = f'bcov_auth={cwtoken}'
+            url = url.split("bcov_auth")[0]+bcov
+        elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+            url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={raw_text4}"
+        if ".pdf*" in url:
+            url = f"https://dragoapi.vercel.app/pdf/{url}"
+        elif 'encrypted.m' in url:
+            appxkey = url.split('*')[1]
+            url = url.split('*')[0]
+
+        if "youtu" in url:
+            ytf = f"bv*[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[height<=?{raw_text2}]"
+        elif "embed" in url:
+            ytf = f"bestvideo[height<={raw_text2}]+bestaudio/best[height<={raw_text2}]"
+        else:
+            ytf = f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
+
+        if "jw-prod" in url:
+            cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
+        elif "webvideos.classplusapp." in url:
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+        elif "youtube.com" in url or "youtu.be" in url:
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+        else:
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
         # Download and send
         current_ist = datetime.datetime.now(IST)
@@ -1393,19 +1786,24 @@ async def text_handler(bot: Client, m: Message):
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         single_batch = '<blockquote>Single Video</blockquote>'
         
+        # Get user's caption style
         user_settings = get_user_settings(m.from_user.id, bot_username)
         caption_style = user_settings.get("caption_style", "bracket_style")
 
+        # Direct download using helper
         res_file = await helper.download_video(url, cmd, name)
         if os.path.exists(res_file):
             ext_actual = os.path.splitext(res_file)[1].lstrip('.')
-            cc = get_video_caption(caption_style, count, single_batch, name1, ext_actual, res, date_str, time_str, CREDIT)
+            cc = get_video_caption(
+                caption_style, count, single_batch, name1, 
+                ext_actual, res, date_str, time_str, CREDIT
+            )
             await helper.send_vid(bot, m, cc, res_file, thumb, name, None, channel_id, watermark=watermark)
         else:
-            await m.reply_text("Download failed.")
+            await m.reply_text("Download failed.", parse_mode=ParseMode.HTML)
 
     except Exception as e:
-        await m.reply_text(f"Error: {str(e)}")
+        await m.reply_text(f"Error: {str(e)}", parse_mode=ParseMode.HTML)
 
 # ========================= OTHER FUNCTIONS =========================
 def notify_owner():
