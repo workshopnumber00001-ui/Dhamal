@@ -85,7 +85,7 @@ DEFAULT_SETTINGS = {
     "resume": False,
     "downloader_name": "🥀°𓏲кяιѕнηα⋆🌿",
     "show_extension": True,
-    "caption_style": "boxed_style",
+    "caption_style": "boxed_style",   # changed default
     "show_title": True,
     "quality": "480",
     "thumbnail": "default",
@@ -96,7 +96,7 @@ DEFAULT_SETTINGS = {
     "pw_token": "your_token_here",
     "proxy": "",
     "sticker_responses": True,
-    "auto_topic": False,
+    "auto_topic": False,   # new
 }
 
 # Style display names mapping
@@ -120,7 +120,7 @@ STYLE_DISPLAY_NAMES = {
     "modern_border": "🏛️ Modern Border",
     "ultra_clean": "💎 Ultra Clean",
     "bracket_style": "📦 Bracket Style",
-    "boxed_style": "📦 Boxed Style",
+    "boxed_style": "📦 Boxed Style",   # new
 }
 
 ALL_STYLES = list(STYLE_DISPLAY_NAMES.keys())
@@ -136,12 +136,16 @@ bot = Client(
     in_memory=True
 )
 
+# Register clean handler
 register_clean_handler(bot)
 
 # ========================= VIDEO CAPTION STYLES =========================
+
 def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic="", subject=""):
+    """Generate video caption based on selected style"""
     plain_batch = re.sub(r'<[^>]+>', '', batch_blockquote).strip()
-    
+
+    # ---------- BOXED STYLE (NEW DEFAULT) ----------
     if style == "boxed_style":
         if ext_actual.lower() == "pdf":
             id_icon = "📁 FILE ID"
@@ -161,6 +165,8 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"🎓 Batch Name : {plain_batch}\n\n"
             f"📥 Downloaded by: {CR}"
         )
+
+    # ---------- BRACKET STYLE ----------
     elif style == "bracket_style":
         if ext_actual.lower() == "pdf":
             file_type = "📄 FILE"
@@ -181,8 +187,303 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
         caption += f"📥 Downloaded by: {CR}\n\n"
         caption += f"📅 {time_str}\n"
         return caption
-    # (all other styles are unchanged – they are exactly as in your original code)
-    else:
+
+    # ---------- ALL OTHER STYLES (unchanged) ----------
+    elif style == "minimal_glass":
+        return (
+            f"\n<b>┌───⧫ 𝐕𝐈𝐃𝐄𝐎 𝐈𝐍𝐅𝐎 ⧫───┐</b>\n"
+            f"│\n"
+            f"│  <b>📌 Index</b> : {str(count).zfill(3)}\n"
+            f"│  <b>📚 Batch</b> : {plain_batch}\n"
+            f"│  <b>📖 Title</b> : {name1}\n"
+            f"│  <b>📤 Ext</b> : {CR}.{ext_actual}\n"
+            f"│  <b>📐 Res</b> : {res}\n"
+            f"│  <b>📅 Date</b> : {date_str}\n"
+            f"│\n"
+            f"├───⧫ <b>UPLOADED BY</b> ⧫───┤\n"
+            f"│  <b>{CR}</b>\n"
+            f"│\n"
+            f"└───⧫ {time_str} ⧫───┘\n"
+        )
+    
+    elif style == "neon_glow":
+        return (
+            f"\n<b>◤━━━━━━━━━⧫ 𝐕𝐈𝐃𝐄𝐎 ⧫━━━━━━━━━◥</b>\n\n"
+            f"  <b>🧭 ID</b> : {str(count).zfill(3)}\n"
+            f"  <b>📦 Batch</b> : {plain_batch}\n"
+            f"  <b>📄 Title</b> : {name1}\n"
+            f"  <b>⚡ Ext</b> : {CR}.{ext_actual}\n"
+            f"  <b>📊 Res</b> : {res}\n"
+            f"  <b>📆 Date</b> : {date_str}\n\n"
+            f"◣━━━━━━━⧫ <b>{CR}</b> ⧫━━━━━━━◢\n"
+            f"<i>{time_str}</i>\n"
+        )
+    
+    elif style == "premium_card":
+        return (
+            f"\n<b>┏━━━━━━━━━━━━━━━━━━━━━━┓</b>\n"
+            f"<b>┃  ⚡ 𝐕𝐈𝐃𝐄𝐎 𝐃𝐄𝐓𝐀𝐈𝐋𝐒</b>\n"
+            f"<b>┣━━━━━━━━━━━━━━━━━━━━━━┫</b>\n"
+            f"<b>┃</b>\n"
+            f"<b>┃  🏷️ ID</b>  : {str(count).zfill(3)}\n"
+            f"<b>┃  📁 Batch</b> : {plain_batch}\n"
+            f"<b>┃  📌 Title</b> : {name1}\n"
+            f"<b>┃  💾 Ext</b>  : {CR}.{ext_actual}\n"
+            f"<b>┃  📐 Res</b>  : {res}\n"
+            f"<b>┃  📅 Date</b> : {date_str}\n"
+            f"<b>┃</b>\n"
+            f"<b>┣━━━━━━━━━━━━━━━━━━━━━━┫</b>\n"
+            f"<b>┃  🎯 {CR}</b>\n"
+            f"<b>┗━━━━━━━━━━━━━━━━━━━━━━┛</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+    
+    elif style == "dark_futuristic":
+        return (
+            f"\n<b>╔═══════════════════════╗</b>\n"
+            f"<b>║  🔥 VIDEO DETAILS</b>\n"
+            f"<b>╠═══════════════════════╣</b>\n"
+            f"<b>║</b>\n"
+            f"<b>║  ◆ ID</b>    : {str(count).zfill(3)}\n"
+            f"<b>║  ◆ Batch</b> : {plain_batch}\n"
+            f"<b>║  ◆ Title</b> : {name1}\n"
+            f"<b>║  ◆ Ext</b>   : {CR}.{ext_actual}\n"
+            f"<b>║  ◆ Res</b>   : {res}\n"
+            f"<b>║  ◆ Date</b>  : {date_str}\n"
+            f"<b>║</b>\n"
+            f"<b>╠═══════════════════════╣</b>\n"
+            f"<b>║  ✦ {CR}</b>\n"
+            f"<b>╚═══════════════════════╝</b>\n\n"
+            f"<i>⏱ {time_str}</i>\n"
+        )
+    
+    elif style == "clean_professional":
+        return (
+            f"\n<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
+            f"<b>  📌 VIDEO DETAILS</b>\n"
+            f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n\n"
+            f"  <b>🆔 Index</b> : {str(count).zfill(3)}\n"
+            f"  <b>📦 Batch</b> : {plain_batch}\n"
+            f"  <b>📄 Title</b> : {name1}\n"
+            f"  <b>📎 Ext</b>   : {CR}.{ext_actual}\n"
+            f"  <b>📐 Res</b>   : {res}\n"
+            f"  <b>📆 Date</b>  : {date_str}\n\n"
+            f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
+            f"  <b>© {CR}</b>\n"
+            f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
+            f"<i>{time_str}</i>\n"
+        )
+    
+    elif style == "cyber_terminal":
+        return (
+            f"\n<b>┌─[ VIDEO ]───────────────────┐</b>\n"
+            f"<b>│</b>\n"
+            f"<b>│  ╭─▶ ID</b>    : {str(count).zfill(3)}\n"
+            f"<b>│  ├─▶ Batch</b> : {plain_batch}\n"
+            f"<b>│  ├─▶ Title</b> : {name1}\n"
+            f"<b>│  ├─▶ Ext</b>   : {CR}.{ext_actual}\n"
+            f"<b>│  ├─▶ Res</b>   : {res}\n"
+            f"<b>│  ╰─▶ Date</b>  : {date_str}\n"
+            f"<b>│</b>\n"
+            f"<b>├─────────────────────────────┤</b>\n"
+            f"<b>│  🚀 {CR}</b>\n"
+            f"<b>└─────────────────────────────┘</b>\n"
+            f"\n<i>⏱ {time_str}</i>\n"
+        )
+    
+    elif style == "dual_border":
+        return (
+            f"\n<b>╔══════════════════════════════╗</b>\n"
+            f"<b>║   ✦ 𝐕𝐈𝐃𝐄𝐎 𝐃𝐄𝐓𝐀𝐈𝐋𝐒 ✦</b>\n"
+            f"<b>╠══════════════════════════════╣</b>\n"
+            f"<b>║</b>\n"
+            f"<b>║  ✦ Index</b>   : {str(count).zfill(3)}\n"
+            f"<b>║  ✦ Batch</b>   : {plain_batch}\n"
+            f"<b>║  ✦ Title</b>   : {name1}\n"
+            f"<b>║  ✦ Format</b>  : {CR}.{ext_actual}\n"
+            f"<b>║  ✦ Quality</b> : {res}\n"
+            f"<b>║  ✦ Date</b>    : {date_str}\n"
+            f"<b>║</b>\n"
+            f"<b>╠══════════════════════════════╣</b>\n"
+            f"<b>║  ✦ Uploaded By</b>\n"
+            f"<b>║  ╰─ {CR}</b>\n"
+            f"<b>╚══════════════════════════════╝</b>\n\n"
+            f"<i>🕐 {time_str}</i>\n"
+        )
+    
+    elif style == "rounded_neon":
+        return (
+            f"\n<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
+            f"<b>▣  🔥 VIDEO INFO</b>\n"
+            f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n\n"
+            f"  <b>⚡ ID</b>   : {str(count).zfill(3)}\n"
+            f"  <b>📦 Batch</b> : {plain_batch}\n"
+            f"  <b>📌 Title</b> : {name1}\n"
+            f"  <b>🎯 Ext</b>  : {CR}.{ext_actual}\n"
+            f"  <b>📐 Res</b>  : {res}\n"
+            f"  <b>📅 Date</b> : {date_str}\n\n"
+            f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
+            f"  <b>🌟 {CR}</b>\n"
+            f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
+            f"\n<i>⏰ {time_str}</i>\n"
+        )
+    
+    elif style == "instagram":
+        return (
+            f"\n<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n\n"
+            f"  <b>🎬 VIDEO</b>\n\n"
+            f"  <b>📌</b> {str(count).zfill(3)}\n"
+            f"  <b>📚</b> {plain_batch}\n"
+            f"  <b>📖</b> {name1}\n"
+            f"  <b>💾</b> {CR}.{ext_actual}\n"
+            f"  <b>📐</b> {res}\n"
+            f"  <b>📆</b> {date_str}\n\n"
+            f"<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n"
+            f"  <b>💫 {CR}</b>\n"
+            f"<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+    
+    elif style == "matrix":
+        return (
+            f"\n<b>┌─────────────────────────┐</b>\n"
+            f"<b>│  ███╗  ██╗███████╗ ██████╗</b>\n"
+            f"<b>│  ████╗ ██║██╔════╝██╔═══██╗</b>\n"
+            f"<b>│  ██╔██╗██║█████╗  ██║   ██║</b>\n"
+            f"<b>│  ██║╚████║██╔══╝  ██║   ██║</b>\n"
+            f"<b>│  ██║ ╚███║██║     ╚██████╔╝</b>\n"
+            f"<b>│  ╚═╝  ╚══╝╚═╝      ╚═════╝</b>\n"
+            f"<b>├─────────────────────────┤</b>\n"
+            f"<b>│  ID</b>    : {str(count).zfill(3)}\n"
+            f"<b>│  Batch</b> : {plain_batch}\n"
+            f"<b>│  Title</b> : {name1}\n"
+            f"<b>│  Ext</b>   : {CR}.{ext_actual}\n"
+            f"<b>│  Res</b>   : {res}\n"
+            f"<b>│  Date</b>  : {date_str}\n"
+            f"<b>├─────────────────────────┤</b>\n"
+            f"<b>│  ▶ {CR}</b>\n"
+            f"<b>└─────────────────────────┘</b>\n"
+            f"\n<i>⏱ {time_str}</i>\n"
+        )
+    
+    elif style == "space_galaxy":
+        return (
+            f"\n<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n"
+            f"<b>    🌟 VIDEO DETAILS</b>\n"
+            f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n\n"
+            f"  <b>🪐 Index</b> : {str(count).zfill(3)}\n"
+            f"  <b>🌌 Batch</b> : {plain_batch}\n"
+            f"  <b>📖 Title</b> : {name1}\n"
+            f"  <b>🔗 Ext</b>  : {CR}.{ext_actual}\n"
+            f"  <b>📐 Res</b>  : {res}\n"
+            f"  <b>📅 Date</b> : {date_str}\n\n"
+            f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n"
+            f"  <b>⭐ {CR}</b>\n"
+            f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n\n"
+            f"<i>🕐 {time_str}</i>\n"
+        )
+    
+    elif style == "minimal_dots":
+        return (
+            f"\n<b>· · · · · · · · · · · · · · ·</b>\n"
+            f"<b>  📌 VIDEO</b>\n"
+            f"<b>· · · · · · · · · · · · · · ·</b>\n\n"
+            f"  <b>• ID</b>    : {str(count).zfill(3)}\n"
+            f"  <b>• Batch</b> : {plain_batch}\n"
+            f"  <b>• Title</b> : {name1}\n"
+            f"  <b>• Ext</b>   : {CR}.{ext_actual}\n"
+            f"  <b>• Res</b>   : {res}\n"
+            f"  <b>• Date</b>  : {date_str}\n\n"
+            f"<b>· · · · · · · · · · · · · · ·</b>\n"
+            f"  <b>{CR}</b>\n"
+            f"<b>· · · · · · · · · · · · · · ·</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+    
+    elif style == "clean_glass":
+        return (
+            f"\n<b>╭─────────────────────╮</b>\n"
+            f"<b>│  ✦ VIDEO DETAILS</b>\n"
+            f"<b>╰─────────────────────╯</b>\n\n"
+            f"  <b>ID</b>    {str(count).zfill(3)}\n"
+            f"  <b>Batch</b> {plain_batch}\n"
+            f"  <b>Title</b> {name1}\n"
+            f"  <b>Ext</b>   {CR}.{ext_actual}\n"
+            f"  <b>Res</b>   {res}\n"
+            f"  <b>Date</b>  {date_str}\n\n"
+            f"<b>─────── ✦ ───────</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  {CR}</b>\n"
+        )
+    
+    elif style == "smooth_flow":
+        return (
+            f"\n<b>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</b>\n"
+            f"<b>  📌 VIDEO</b>\n"
+            f"<b>▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔</b>\n\n"
+            f"  <b>◈ ID</b>    {str(count).zfill(3)}\n"
+            f"  <b>◈ Batch</b> {plain_batch}\n"
+            f"  <b>◈ Title</b> {name1}\n"
+            f"  <b>◈ Ext</b>   {CR}.{ext_actual}\n"
+            f"  <b>◈ Res</b>   {res}\n"
+            f"  <b>◈ Date</b>  {date_str}\n\n"
+            f"<b>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  ◆ {CR}</b>\n"
+        )
+    
+    elif style == "minimal_dot":
+        return (
+            f"\n<b>• • • • • • • • • • • • • •</b>\n"
+            f"<b>  ▫ VIDEO</b>\n"
+            f"<b>• • • • • • • • • • • • • •</b>\n\n"
+            f"  <b>◉</b> ID    {str(count).zfill(3)}\n"
+            f"  <b>◉</b> Batch {plain_batch}\n"
+            f"  <b>◉</b> Title {name1}\n"
+            f"  <b>◉</b> Ext   {CR}.{ext_actual}\n"
+            f"  <b>◉</b> Res   {res}\n"
+            f"  <b>◉</b> Date  {date_str}\n\n"
+            f"<b>• • • • • • • • • • • • • •</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  {CR}</b>\n"
+        )
+    
+    elif style == "modern_border":
+        return (
+            f"\n<b>┌──────────────────────┐</b>\n"
+            f"<b>│  ★ VIDEO DETAILS</b>\n"
+            f"<b>├──────────────────────┤</b>\n"
+            f"<b>│</b>\n"
+            f"<b>│  ID</b>    {str(count).zfill(3)}\n"
+            f"<b>│  Batch</b> {plain_batch}\n"
+            f"<b>│  Title</b> {name1}\n"
+            f"<b>│  Ext</b>   {CR}.{ext_actual}\n"
+            f"<b>│  Res</b>   {res}\n"
+            f"<b>│  Date</b>  {date_str}\n"
+            f"<b>│</b>\n"
+            f"<b>├──────────────────────┤</b>\n"
+            f"<b>│  {CR}</b>\n"
+            f"<b>└──────────────────────┘</b>\n"
+            f"\n<i>{time_str}</i>\n"
+        )
+    
+    elif style == "ultra_clean":
+        return (
+            f"\n<b>── ✦ ── ✦ ── ✦ ──</b>\n"
+            f"<b>  VIDEO</b>\n"
+            f"<b>── ✦ ── ✦ ── ✦ ──</b>\n\n"
+            f"  ID    : {str(count).zfill(3)}\n"
+            f"  Batch : {plain_batch}\n"
+            f"  Title : {name1}\n"
+            f"  Ext   : {CR}.{ext_actual}\n"
+            f"  Res   : {res}\n"
+            f"  Date  : {date_str}\n\n"
+            f"<b>── ✦ ── ✦ ── ✦ ──</b>\n"
+            f"<i>{time_str}</i>\n"
+            f"<b>  {CR}</b>\n"
+        )
+    
+    else:  # default fallback
         return (
             f"\n<b>🧭 Index ID:</b> {str(count).zfill(3)}\n\n"
             f"<b>📎 Batch:</b> {plain_batch}\n\n"
@@ -195,6 +496,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
         )
 
 # ========================= SETTINGS SYSTEM =========================
+
 def get_user_settings(user_id: int, bot_username: str = None) -> dict:
     if bot_username is None:
         bot_username = bot.me.username
@@ -217,9 +519,11 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton(f"Resume Interrupted {status('resume')}", callback_data="set_resume_toggle")])
     buttons.append([InlineKeyboardButton(f"Downloader Name: {settings['downloader_name'][:10]}", callback_data="set_downloader_name")])
     buttons.append([InlineKeyboardButton(f"Show Extension {status('show_extension')}", callback_data="set_show_extension_toggle")])
+    
     current_style = settings.get('caption_style', 'boxed_style')
     display_name = STYLE_DISPLAY_NAMES.get(current_style, current_style)
     buttons.append([InlineKeyboardButton(f"🎨 Caption Style: {display_name}", callback_data="set_caption_style")])
+    
     buttons.append([InlineKeyboardButton(f"Show Title {status('show_title')}", callback_data="set_show_title_toggle")])
     buttons.append([InlineKeyboardButton(f"Quality: {settings['quality']}p", callback_data="set_quality")])
     buttons.append([InlineKeyboardButton(f"Thumbnail: {'Custom' if settings['thumbnail']!='default' else 'Default'}", callback_data="set_thumbnail")])
@@ -231,7 +535,7 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton("📂 Manage Subject Groups", callback_data="set_subject_groups")])
     buttons.append([InlineKeyboardButton("Manage Database", callback_data="set_db_info")])
     buttons.append([InlineKeyboardButton(f"Sticker Responses {status('sticker_responses')}", callback_data="set_sticker_responses_toggle")])
-    buttons.append([InlineKeyboardButton(f"Auto Topic {status('auto_topic')}", callback_data="set_auto_topic_toggle")])
+    buttons.append([InlineKeyboardButton(f"Auto Topic {status('auto_topic')}", callback_data="set_auto_topic_toggle")])  # new
     buttons.append([InlineKeyboardButton("🔙 Back to Main Menu", callback_data="main_menu")])
     return InlineKeyboardMarkup(buttons)
 
@@ -530,7 +834,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
 
 # ========================= END SETTINGS SYSTEM =========================
 
-# ========================= OTHER COMMANDS =========================
 @bot.on_message(filters.command("setlog") & filters.private)
 async def set_log_channel_cmd(client: Client, message: Message):
     try:
@@ -574,11 +877,13 @@ api_url = "http://master-api-v3.vercel.app/"
 api_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzkxOTMzNDE5NSIsInRnX3VzZXJuYW1lIjoi4p61IFtvZmZsaW5lXSIsImlhdCI6MTczODY5MjA3N30.SXzZ1MZcvMp5sGESj0hBKSghhxJ3k1GTWoBUbivUe1I"
 cwtoken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NTExOTcwNjQsImNvbiI6eyJpc0FkbWluIjpmYWxzZSwiYXVzZXIiOiJVMFZ6TkdGU2NuQlZjR3h5TkZwV09FYzBURGxOZHowOSIsImlkIjoiVWtoeVRtWkhNbXRTV0RjeVJIcEJUVzExYUdkTlp6MDkiLCJmaXJzdF9uYW1lIjoiVWxadVFXaFBaMnAwSzJsclptVXpkbGxXT0djMkREWlRZVFZ5YzNwdldXNXhhVEpPWjFCWFYyd3pWVDA9IiwiZW1haWwiOiJWSGgyWjB0d2FUZFdUMVZYYmxoc2FsZFJSV2xrY0RWM2FGSkRSU3RzV0c5M1pDOW1hR0kxSzBOeVRUMD0iLCJwaG9uZSI6IldGcFZSSFZOVDJFeGNFdE9Oak4zUzJocmVrNHdRVDA5IiwiYXZhdGFyIjoiSzNWc2NTOHpTMHAwUW5sa2JrODNSRGx2ZWtOaVVUMDkiLCJyZWZlcnJhbF9jb2RlIjoiWkdzMlpUbFBORGw2Tm5OclMyVTRiRVIxTkVWb1FUMDkiLCJkZXZpY2VfdHlwZSI6ImFuZHJvaWQiLCJkZXZpY2VfdmVyc2lvbiI6IlEoQW5kcm9pZCAxMC4wKSIsImRldmljZV9tb2RlbCI6IlhpYW9taSBNMjAwN0oyMENJIiwicmVtb3RlX2FkZHIiOiI0NC4yMDIuMTkzLjIyMCJ9fQ.ONBsbnNwCQQtKMK2h18LCi73e90s2Cr63ZaIHtYueM-Gt5Z4sF6Ay-SEaKaIf1ir9ThflrtTdi5eFkUGIcI78R1stUUch_GfBXZsyg7aVyH2wxm9lKsFB2wK3qDgpd0NiBoT-ZsTrwzlbwvCFHhMp9rh83D4kZIPPdbp5yoA_06L0Zr4fNq3S328G8a8DtboJFkmxqG2T1yyVE2wLIoR3b8J3ckWTlT_VY2CCx8RjsstoTrkL8e9G5ZGa6sksMb93ugautin7GKz-nIz27pCr0h7g9BCoQWtL69mVC5xvVM3Z324vo5uVUPBi1bCG-ptpD9GWQ4exOBk9fJvGo-vRg"
 
+# ⭐ NEW PHOTO URL
 photologo = 'https://files.catbox.moe/4pbjt9.jpg'
 photoyt = 'https://tinypic.host/images/2025/03/18/YouTube-Logo.wine.png'
 photocp = 'https://tinypic.host/images/2025/03/28/IMG_20250328_133126.jpg'
 photozip = 'https://envs.sh/fH.jpg/IMG20250803719.jpg'
 
+# Inline keyboards
 BUTTONSCONTACT = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url="https://t.me/Helpbykrishna2_bot")]])
 keyboard = InlineKeyboardMarkup(
     [
@@ -765,12 +1070,14 @@ async def send_logs(client: Client, m: Message):
     except Exception as e:
         await m.reply_text(f"**Error:** {e}", parse_mode=ParseMode.HTML)
 
-# ========================= MAIN DRM HANDLER (BATCH) - MODIFIED =========================
+# ========================= MAIN DRM HANDLER (BATCH) – MODIFIED =========================
 @bot.on_message(filters.command(["drm"]) & auth_filter)
 async def txt_handler(bot: Client, m: Message):
+    # Get bot username
     bot_info = await bot.get_me()
     bot_username = bot_info.username
 
+    # Check authorization
     if m.chat.type == "channel":
         if not db.is_channel_authorized(m.chat.id, bot_username):
             return
@@ -811,23 +1118,25 @@ async def txt_handler(bot: Client, m: Message):
         lines = [line.strip() for line in content.split("\n") if line.strip()]
         for line in lines:
             if "://" not in line:
-                continue
+                continue  # skip lines without URL (like separators)
             parts = line.split("://", 1)
             if len(parts) == 2:
-                name = parts[0]
-                url = "https://" + parts[1] if not parts[1].startswith("http") else parts[1]
+                name = parts[0].strip()
+                url = "https://" + parts[1].strip() if not parts[1].startswith("http") else parts[1].strip()
                 # Extract folder from [ ... ] in name
                 folder_match = re.search(r'\[([^\]]+)\]', name)
                 if folder_match:
                     folder = folder_match.group(1).strip()
                 else:
                     folder = "General"
+                # Clean title (remove the folder tag and extra symbols)
                 title = re.sub(r'\[[^\]]+\]', '', name).strip()
-                title = re.sub(r'^[🎥📄]+\s*', '', title)
+                title = re.sub(r'^[🎥📄]+\s*', '', title)  # remove emoji prefix
                 if folder not in folders:
                     folders[folder] = []
                 folders[folder].append((title, url))
                 all_links_count += 1
+                # Count types
                 if ".pdf" in url: pdf_count += 1
                 elif url.endswith((".png", ".jpeg", ".jpg")): img_count += 1
                 elif "v2" in url: v2_count += 1
@@ -847,6 +1156,7 @@ async def txt_handler(bot: Client, m: Message):
         os.remove(x)
         return
 
+    # Show folder summary
     folder_summary = "\n".join([f"📂 {f}: {len(links)} items" for f, links in folders.items()])
     await editable.edit(
         f"**📂 Folders found:**\n{folder_summary}\n\n"
@@ -883,6 +1193,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_text0 = '/d'
     b_name = file_name.replace('_', ' ') if raw_text0 == '/d' else raw_text0
 
+    # NEW: Topic Name prompt
     await editable.edit("Enter Topic Name (or /d for default):", parse_mode=ParseMode.HTML)
     try:
         input_topic: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -892,6 +1203,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_topic = '/d'
     topic = "General" if raw_topic == '/d' else raw_topic
 
+    # NEW: Subject Name prompt
     await editable.edit("Enter Subject Name (or /d for default):", parse_mode=ParseMode.HTML)
     try:
         input_subject: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -901,6 +1213,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_subject = '/d'
     subject = "General" if raw_subject == '/d' else raw_subject
 
+    # Resolution
     await editable.edit("Enter resolution:\n144/240/360/480/720/1080", parse_mode=ParseMode.HTML)
     try:
         input2: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -914,6 +1227,7 @@ async def txt_handler(bot: Client, m: Message):
     except:
         res = "UN"
 
+    # Watermark
     await editable.edit("Send watermark text or /d for none", parse_mode=ParseMode.HTML)
     try:
         inputx: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -924,6 +1238,7 @@ async def txt_handler(bot: Client, m: Message):
     global watermark
     watermark = "/d" if raw_textx == '/d' else raw_textx
 
+    # Credit
     await editable.edit("Send credit name or /d for default", parse_mode=ParseMode.HTML)
     try:
         input3: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -938,6 +1253,7 @@ async def txt_handler(bot: Client, m: Message):
     else:
         CR = raw_text3
 
+    # PW Token
     await editable.edit("Send PW token or /d", parse_mode=ParseMode.HTML)
     try:
         input4: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -946,6 +1262,7 @@ async def txt_handler(bot: Client, m: Message):
     except asyncio.TimeoutError:
         raw_text4 = '/d'
 
+    # Thumbnail
     await editable.edit("Send photo for thumbnail, /d for default, /skip to skip", parse_mode=ParseMode.HTML)
     thumb = "/d"
     try:
@@ -976,7 +1293,7 @@ async def txt_handler(bot: Client, m: Message):
         print(f"Thumb handling error: {e}")
         thumb = "/d"
 
-    # ===== AUTO-DETECT CHAT =====
+    # ===== AUTO-DETECT CHAT (NO PROMPT) =====
     channel_id = m.chat.id
     if m.chat.type in ["group", "supergroup"]:
         try:
@@ -1024,37 +1341,162 @@ async def txt_handler(bot: Client, m: Message):
 
     failed_count = 0
     count = start_index + 1
+
+    # Get caption style once
     user_settings = get_user_settings(m.from_user.id, bot_username)
     caption_style = user_settings.get("caption_style", "boxed_style")
 
     for folder, title, url in items_to_process:
         topic_id = folder_topics.get(folder) if auto_topic else None
 
-        # ---- NAME CLEANING (EXACTLY AS ORIGINAL) ----
+        # ---- Prepare name (exactly as original) ----
         name1 = title.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
         if "," in raw_text3:
             name = f'{PRENAME} {name1[:60]}'
         else:
             name = f'{name1[:60]}'
 
-        # ---- URL TRANSFORMATIONS (your original full block) ----
+        # ---- URL transformations (copy your ENTIRE original block here) ----
+        # This is the same as your original code – I'm including the full block for completeness.
         Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = "https://" + Vxy
         link0 = "https://" + Vxy
 
-        # (copy all your original if-elif blocks exactly as they were – I'm not repeating them here to save space, but you must include them)
-        # In the actual file, you will have the full transformation block from your original code.
-        # I'll put a placeholder comment here; you know where to paste.
+        # --- visionias ---
+        if "visionias" in url:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
+                    text = await resp.text()
+                    url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
 
-        # ... (your complete URL transformation and cmd construction code goes here) ...
+        # --- acecwply ---
+        if "acecwply" in url:
+            cmd = f'yt-dlp -o "{name}.%(ext)s" -f "bestvideo[height<={raw_text2}]+bestaudio" --hls-prefer-ffmpeg --no-keep-video --remux-video mkv --no-warning "{url}"'
 
-        # ---- Caption ----
+        # --- classx trans ---
+        elif "https://static-trans-v1.classx.co.in" in url or "https://static-trans-v2.classx.co.in" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split(".mkv")[0] + ".mkv"
+            if "static-trans-v1.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v1.classx.co.in", "https://appx-transcoded-videos-mcdn.akamai.net.in")
+            elif "static-trans-v2.classx.co.in" in url:
+                base_clean = base_clean.replace("https://static-trans-v2.classx.co.in", "https://transcoded-videos-v2.classx.co.in")
+            url = f"{base_clean}*{signature}"
+
+        # --- static-rec ---
+        elif "https://static-rec.classx.co.in/drm/" in url:
+            base_with_params, signature = url.split("*")
+            base_clean = base_with_params.split("?")[0]
+            base_clean = base_clean.replace("https://static-rec.classx.co.in", "https://appx-recordings-mcdn.akamai.net.in")
+            url = f"{base_clean}*{signature}"
+
+        # --- static-wsb ---
+        elif "https://static-wsb.classx.co.in/" in url:
+            clean_url = url.split("?")[0]
+            clean_url = clean_url.replace("https://static-wsb.classx.co.in", "https://appx-wsb-gcp-mcdn.akamai.net.in")
+            url = clean_url
+
+        # --- static-db ---
+        elif "https://static-db.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db.classx.co.in", "https://appxcontent.kaxa.in")
+
+        # --- static-db-v2 ---
+        elif "https://static-db-v2.classx.co.in/" in url:
+            if "*" in url:
+                base_url, key = url.split("*", 1)
+                base_url = base_url.split("?")[0]
+                base_url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+                url = f"{base_url}*{key}"
+            else:
+                base_url = url.split("?")[0]
+                url = base_url.replace("https://static-db-v2.classx.co.in", "https://appx-content-v2.classx.co.in")
+
+        # --- testbook / classplus drm ---
+        elif "https://cpvod.testbook.com/" in url or "classplusapp.com/drm/" in url:
+            url = url.replace("https://cpvod.testbook.com/","https://media-cdn.classplusapp.com/drm/")
+            url = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            mpd, keys = helper.get_mps_and_keys(url)
+            url = mpd
+            keys_string = " ".join([f"--key {key}" for key in keys])
+
+        # --- classplusapp ---
+        elif "classplusapp" in url:
+            signed_api = f"https://covercel.vercel.app/extract_keys?url={url}@bots_updatee&user_id=7793257011"
+            response = requests.get(signed_api, timeout=40)
+            url = response.json()['url']
+
+        # --- tencdn.classplusapp ---
+        elif "tencdn.classplusapp" in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+
+        # --- videos.classplusapp ---
+        elif 'videos.classplusapp' in url:
+            url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': f'{raw_text4}'}).json()['url']
+
+        # --- media-cdn.classplusapp.com ---
+        elif 'media-cdn.classplusapp.com' in url or 'media-cdn-alisg.classplusapp.com' in url or 'media-cdn-a.classplusapp.com' in url:
+            headers = {'host': 'api.classplusapp.com', 'x-access-token': f'{raw_text4}', 'accept-language': 'EN', 'api-version': '18', 'app-version': '1.4.73.2', 'build-number': '35', 'connection': 'Keep-Alive', 'content-type': 'application/json', 'device-details': 'Xiaomi_Redmi 7_SDK-32', 'device-id': 'c28d3cb16bbdac01', 'region': 'IN', 'user-agent': 'Mobile-Android', 'webengage-luid': '00000187-6fe4-5d41-a530-26186858be4c', 'accept-encoding': 'gzip'}
+            params = {"url": f"{url}"}
+            response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            url = response.json()['url']
+
+        # --- childId & parentId ---
+        elif "childId" in url and "parentId" in url:
+            url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={raw_text4}"
+
+        # --- brightcove ---
+        if "edge.api.brightcove.com" in url:
+            bcov = f'bcov_auth={cwtoken}'
+            url = url.split("bcov_auth")[0]+bcov
+
+        # --- d1d34p8vz63oiq / sec1.pw.live ---
+        elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+            url = f"https://anonymouspwplayer-b99f57957198.herokuapp.com/pw?url={url}?token={raw_text4}"
+
+        # --- .pdf* ---
+        if ".pdf*" in url:
+            url = f"https://dragoapi.vercel.app/pdf/{url}"
+
+        # --- encrypted.m ---
+        elif 'encrypted.m' in url:
+            appxkey = url.split('*')[1]
+            url = url.split('*')[0]
+
+        # --- yt-dlp format selection ---
+        if "youtu" in url:
+            ytf = f"bv*[height<={raw_text2}][ext=mp4]+ba[ext=m4a]/b[height<=?{raw_text2}]"
+        elif "embed" in url:
+            ytf = f"bestvideo[height<={raw_text2}]+bestaudio/best[height<={raw_text2}]"
+        else:
+            ytf = f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
+
+        # --- cmd construction ---
+        if "jw-prod" in url:
+            cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
+        elif "webvideos.classplusapp." in url:
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+        elif "youtube.com" in url or "youtu.be" in url:
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+        else:
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
+
+        # Prepare captions
         current_ist = datetime.datetime.now(IST)
         date_str = current_ist.strftime('%d-%m-%Y')
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         batch_blockquote = f'<blockquote>{b_name}</blockquote>'
 
-        # ---- DOWNLOAD/UPLOAD LOOP (as original, with message_thread_id added) ----
+        # ===== ORIGINAL DOWNLOAD/UPLOAD LOGIC – with message_thread_id added =====
         try:
             if "drive" in url:
                 ka = await helper.download(url, name)
@@ -1066,10 +1508,121 @@ async def txt_handler(bot: Client, m: Message):
                 continue
 
             elif ".pdf" in url:
-                # ... your PDF logic (with message_thread_id added) ...
-                pass
+                if "cwmediabkt99" in url:
+                    max_retries = 3
+                    retry_delay = 4
+                    success = False
+                    for attempt in range(max_retries):
+                        try:
+                            await asyncio.sleep(retry_delay)
+                            url = url.replace(" ", "%20")
+                            scraper = cloudscraper.create_scraper()
+                            response = scraper.get(url)
+                            if response.status_code == 200:
+                                with open(f'{name}.pdf', 'wb') as file:
+                                    file.write(response.content)
+                                ext_actual = "pdf"
+                                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                                await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                                count += 1
+                                os.remove(f'{name}.pdf')
+                                success = True
+                                break
+                        except Exception as e:
+                            await asyncio.sleep(retry_delay)
+                    if not success:
+                        await m.reply_text(f"Failed to download PDF after retries.", parse_mode=ParseMode.HTML)
+                        failed_count += 1
+                        count += 1
+                        continue
+                else:
+                    cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
+                    download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                    os.system(download_cmd)
+                    ext_actual = "pdf"
+                    cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                    await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                    count += 1
+                    os.remove(f'{name}.pdf')
+                continue
 
-            # ... all other branches (encrypted, drm, else) with message_thread_id added ...
+            elif ".ws" in url and url.endswith(".ws"):
+                await helper.pdf_download(f"{api_url}utkash-ws?url={url}&authorization={api_token}", f"{name}.html")
+                time.sleep(1)
+                ext_actual = "html"
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                os.remove(f'{name}.html')
+                count += 1
+                continue
+
+            elif any(ext in url for ext in [".jpg", ".jpeg", ".png"]):
+                ext_actual = url.split('.')[-1]
+                cmd = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
+                os.system(cmd)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                count += 1
+                os.remove(f'{name}.{ext_actual}')
+                continue
+
+            elif any(ext in url for ext in [".mp3", ".wav", ".m4a"]):
+                ext_actual = url.split('.')[-1]
+                cmd = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
+                os.system(cmd)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                os.remove(f'{name}.{ext_actual}')
+                count += 1
+                continue
+
+            elif 'encrypted.m' in url:
+                Show = f"<i><b>⚡ Video APPX Encrypted Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
+                prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True, message_thread_id=topic_id)
+                try:
+                    res_file = await helper.download_and_decrypt_video(url, cmd, name, appxkey)
+                    filename = res_file
+                    await prog.delete(True)
+                    if os.path.exists(filename):
+                        ext_actual = os.path.splitext(filename)[1].lstrip('.')
+                        cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                        await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
+                        count += 1
+                    else:
+                        await bot.send_message(channel_id, f'⚠️ Failed to decrypt.', parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                        failed_count += 1
+                        count += 1
+                        continue
+                except Exception as e:
+                    await bot.send_message(channel_id, f'⚠️ Error: {str(e)}', parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+                    failed_count += 1
+                    count += 1
+                    continue
+
+            elif 'drmcdni' in url or 'drm/wv' in url:
+                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
+                prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True, message_thread_id=topic_id)
+                res_file = await helper.decrypt_and_merge_video(mpd, keys_string, path, name, raw_text2)
+                filename = res_file
+                await prog.delete(True)
+                ext_actual = os.path.splitext(filename)[1].lstrip('.')
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
+                count += 1
+                await asyncio.sleep(1)
+                continue
+
+            else:
+                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
+                prog = await bot.send_message(channel_id, Show, parse_mode=ParseMode.HTML, disable_web_page_preview=True, message_thread_id=topic_id)
+                res_file = await helper.download_video(url, cmd, name)
+                filename = res_file
+                await prog.delete(True)
+                ext_actual = os.path.splitext(filename)[1].lstrip('.')
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
+                await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
+                count += 1
+                time.sleep(1)
 
         except Exception as e:
             await bot.send_message(channel_id, f'⚠️ Download Failed: {str(e)}', parse_mode=ParseMode.HTML, message_thread_id=topic_id)
@@ -1077,7 +1630,7 @@ async def txt_handler(bot: Client, m: Message):
             count += 1
             continue
 
-    # ===== FINAL SUMMARY =====
+    # ===== FINAL SUMMARY (TREE FORMAT) =====
     success_count = all_links_count - failed_count
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
     summary = (
@@ -1101,11 +1654,13 @@ async def txt_handler(bot: Client, m: Message):
 async def text_handler(bot: Client, m: Message):
     if m.from_user.is_bot:
         return
+    # Ignore commands
     if m.text and m.text.startswith('/'):
         return
     links = m.text
     match = re.search(r'https?://\S+', links)
     if not match:
+        # No URL found – silently ignore to avoid "Invalid link format"
         return
     link = match.group(0)
 
@@ -1136,7 +1691,7 @@ async def text_handler(bot: Client, m: Message):
         name1 = links.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
         name = f'{name1[:60]}'
 
-        # ---- URL transformations (same as batch) ----
+        # Apply transformations (same as batch)
         if "visionias" in url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
@@ -1230,14 +1785,17 @@ async def text_handler(bot: Client, m: Message):
         else:
             cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
+        # Download and send
         current_ist = datetime.datetime.now(IST)
         date_str = current_ist.strftime('%d-%m-%Y')
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         single_batch = '<blockquote>Single Video</blockquote>'
         
+        # Get user's caption style
         user_settings = get_user_settings(m.from_user.id, bot_username)
         caption_style = user_settings.get("caption_style", "boxed_style")
 
+        # Direct download using helper
         res_file = await helper.download_video(url, cmd, name)
         if os.path.exists(res_file):
             ext_actual = os.path.splitext(res_file)[1].lstrip('.')
