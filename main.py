@@ -78,15 +78,7 @@ count = 0
 userbot = None
 timeout_duration = 300
 
-# ---------- HELPER: SANITIZE FILENAME ----------
-def sanitize_filename(name):
-    """Remove unsafe characters for filesystem, keep letters/numbers/underscore/hyphen."""
-    safe = re.sub(r'[^\w\s-]', '', name)   # remove emojis, brackets, etc.
-    safe = re.sub(r'[-\s]+', '_', safe).strip('_')  # replace spaces/hyphens with underscore
-    safe = safe[:60]  # limit length
-    return safe
-
-# ---------- DEFAULT SETTINGS ----------
+# Default settings
 DEFAULT_SETTINGS = {
     "auto_upload": True,
     "batch_upload": True,
@@ -108,7 +100,7 @@ DEFAULT_SETTINGS = {
     "default_upload_chat": None,
 }
 
-# ---------- STYLE DISPLAY NAMES ----------
+# Style display names mapping
 STYLE_DISPLAY_NAMES = {
     "default": "📝 Default",
     "minimal_glass": "🔲 Minimal Glass",
@@ -153,7 +145,7 @@ STYLE_DISPLAY_NAMES = {
 
 ALL_STYLES = list(STYLE_DISPLAY_NAMES.keys())
 
-# ---------- BOT INIT ----------
+# Initialize bot
 bot = Client(
     "ugx",
     api_id=API_ID,
@@ -166,9 +158,7 @@ bot = Client(
 
 register_clean_handler(bot)
 
-# ============================================================
-# VIDEO CAPTION STYLES (all styles)
-# ============================================================
+# ========================= VIDEO CAPTION STYLES =========================
 def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic="", subject=""):
     plain_batch = re.sub(r'<[^>]+>', '', batch_blockquote).strip()
 
@@ -189,18 +179,15 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"[──────────────────────]\n"
             f"\n📅 {time_str}\n"
         )
-    
     elif style == "boxed_style":
         if ext_actual.lower() in ["pdf", "jpg", "jpeg", "png"]:
             id_icon = "📁 FILE ID"
         else:
             id_icon = "🎥 VIDEO ID"
-        
         if ext_actual.lower() in ["pdf", "jpg", "jpeg", "png"]:
             title = f"{name1} .{ext_actual}"
         else:
             title = f"{name1} {res} .{ext_actual}"
-        
         return (
             f"╭━━━━━━━━━━━╮\n"
             f"{id_icon}: {str(count).zfill(3)}\n"
@@ -211,26 +198,20 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"🎓 Batch Name : {plain_batch}\n\n"
             f"📥 Downloaded by: {CR}"
         )
-
-    # All other styles (minimal_glass, neon_glow, etc.)
-    # For brevity we keep a few, but in your code you can include all.
-    # We'll provide a generic fallback that looks decent.
+    # All other styles (keep your original full style block here – I'm showing a fallback)
     else:
-        # Generic minimal style
         return (
-            f"\n📌 **ID:** {str(count).zfill(3)}\n"
-            f"📚 **Batch:** {plain_batch}\n"
-            f"📄 **Title:** {name1}\n"
-            f"📤 **Extension:** {CR}.{ext_actual}\n"
-            f"📐 **Resolution:** {res}\n"
-            f"📅 **Date:** {date_str}\n"
-            f"🍁 **Uploaded By:** {CR}\n"
+            f"\n<b>🧭 Index ID:</b> {str(count).zfill(3)}\n\n"
+            f"<b>📎 Batch:</b> {plain_batch}\n\n"
+            f"<b>📥 Title:</b> {name1}\n\n"
+            f"[{date_str}]\n\n"
+            f"<b>📤 Extension:</b> {CR}.{ext_actual}\n"
+            f"<b>🧩 Resolution:</b> {res}\n\n"
+            f"<b>🍁 Uploaded By:</b> {CR}\n\n"
             f"{time_str}\n"
         )
 
-# ============================================================
-# SETTINGS SYSTEM
-# ============================================================
+# ========================= SETTINGS SYSTEM =========================
 def get_user_settings(user_id: int, bot_username: str = None) -> dict:
     if bot_username is None:
         bot_username = bot.me.username
@@ -242,7 +223,6 @@ def get_user_settings(user_id: int, bot_username: str = None) -> dict:
 def update_setting(user_id: int, key: str, value, bot_username: str = None):
     if bot_username is None:
         bot_username = bot.me.username
-    # Ensure we update the correct field
     db.update_user_setting(user_id, bot_username, key, value)
 
 def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
@@ -254,11 +234,9 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton(f"Resume Interrupted {status('resume')}", callback_data="set_resume_toggle")])
     buttons.append([InlineKeyboardButton(f"Downloader Name: {settings['downloader_name'][:10]}", callback_data="set_downloader_name")])
     buttons.append([InlineKeyboardButton(f"Show Extension {status('show_extension')}", callback_data="set_show_extension_toggle")])
-    
     current_style = settings.get('caption_style', 'boxed_style')
     display_name = STYLE_DISPLAY_NAMES.get(current_style, current_style)
     buttons.append([InlineKeyboardButton(f"🎨 Caption Style: {display_name}", callback_data="set_caption_style")])
-    
     buttons.append([InlineKeyboardButton(f"Show Title {status('show_title')}", callback_data="set_show_title_toggle")])
     buttons.append([InlineKeyboardButton(f"Quality: {settings['quality']}p", callback_data="set_quality")])
     buttons.append([InlineKeyboardButton(f"Thumbnail: {'Custom' if settings['thumbnail']!='default' else 'Default'}", callback_data="set_thumbnail")])
@@ -576,9 +554,8 @@ async def settings_callback(client: Client, query: CallbackQuery):
         await query.answer(f"Error: {str(e)}")
         await query.message.reply_text(f"❌ Error: {str(e)}")
 
-# ============================================================
-# OTHER COMMANDS
-# ============================================================
+# ========================= END SETTINGS SYSTEM =========================
+
 @bot.on_message(filters.command("setlog") & filters.private)
 async def set_log_channel_cmd(client: Client, message: Message):
     try:
@@ -809,7 +786,7 @@ async def send_logs(client: Client, m: Message):
         await m.reply_text(f"**Error:** {e}")
 
 # ============================================================
-# MAIN DRM HANDLER – with improved folder detection, file finding, settings
+# MAIN DRM HANDLER – MODIFIED FOR FOLDER GROUPING & AUTO-TOPIC
 # ============================================================
 @bot.on_message(filters.command(["drm"]) & auth_filter)
 async def txt_handler(bot: Client, m: Message):
@@ -845,7 +822,7 @@ async def txt_handler(bot: Client, m: Message):
     file_name, ext = os.path.splitext(os.path.basename(x))
     path = f"./downloads/{m.chat.id}"
 
-    # ===== PARSE FILE WITH IMPROVED FOLDER DETECTION =====
+    # ===== PARSE FILE AND GROUP BY FOLDER =====
     folders = {}
     current_folder = "General"
     all_links_count = 0
@@ -859,17 +836,16 @@ async def txt_handler(bot: Client, m: Message):
             # If line does NOT contain "://", treat it as a folder name
             if "://" not in line:
                 current_folder = line.strip()
-                # Ensure folder exists
                 if current_folder not in folders:
                     folders[current_folder] = []
                 continue
-            
+
             # Otherwise, it's a "Name: URL" line
             parts = line.split("://", 1)
             if len(parts) == 2:
                 name = parts[0].strip()
                 url = "https://" + parts[1].strip() if not parts[1].startswith("http") else parts[1].strip()
-                
+
                 # Check if name contains '/' or '\' for explicit folder
                 if "/" in name or "\\" in name:
                     separator = "/" if "/" in name else "\\"
@@ -877,14 +853,13 @@ async def txt_handler(bot: Client, m: Message):
                 else:
                     folder = current_folder
                     title = name
-                
-                # Ensure folder exists
+
                 if folder not in folders:
                     folders[folder] = []
                 folders[folder].append((title, url))
                 all_links_count += 1
-                
-                # Count types
+
+                # Count types (same as original)
                 if ".pdf" in url: pdf_count += 1
                 elif url.endswith((".png", ".jpeg", ".jpg")): img_count += 1
                 elif "v2" in url: v2_count += 1
@@ -904,6 +879,7 @@ async def txt_handler(bot: Client, m: Message):
         os.remove(x)
         return
 
+    # Show folder summary
     folder_summary = "\n".join([f"📂 {f}: {len(links)} items" for f, links in folders.items()])
     await editable.edit(
         f"**📂 Folders found:**\n{folder_summary}\n\n"
@@ -929,7 +905,7 @@ async def txt_handler(bot: Client, m: Message):
         await editable.edit(f"Enter number in range 1-{all_links_count}")
         return
 
-    # ===== ASK FOR BATCH INFO =====
+    # ===== ASK FOR BATCH INFO (same as original) =====
     await editable.edit("1. Enter Batch Name\n2. Send /d for default")
     try:
         input1: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1035,7 +1011,7 @@ async def txt_handler(bot: Client, m: Message):
     # ===== AUTO-DETECT CHAT (NO PROMPT) =====
     channel_id = m.chat.id
 
-    # Check admin
+    # Check admin (for groups/supergroups)
     if m.chat.type in ["group", "supergroup"]:
         try:
             bot_member = await bot.get_chat_member(channel_id, bot.me.id)
@@ -1056,10 +1032,7 @@ async def txt_handler(bot: Client, m: Message):
         try:
             target_chat = await bot.get_chat(channel_id)
             if target_chat.type == "supergroup":
-                # Test if topics are enabled and bot has permission
-                test_topic = await bot.create_forum_topic(channel_id, title="test")
-                await test_topic.delete()
-                # Create topics for each folder
+                # Create a topic for each folder
                 for folder in folders.keys():
                     topic_title = f"{folder} - {b_name}" if b_name else folder
                     topic = await bot.create_forum_topic(channel_id, title=topic_title[:100])
@@ -1078,40 +1051,33 @@ async def txt_handler(bot: Client, m: Message):
     await editable.delete()
 
     # ===== PROCESS EACH FOLDER =====
-    failed_count = 0
-    total_success = 0
-    processed_items = 0
-
+    # Create a flat list of all items with their folder
     all_items = []
     for folder, links in folders.items():
         for title, url in links:
             all_items.append((folder, title, url))
+
+    # Start from the given index
     items_to_process = all_items[start_index:]
 
-    folder_stats = {}
+    # Counters (same as original)
+    failed_count = 0
+    count = start_index + 1  # to maintain ID numbering
 
-    for idx, (folder, title, url) in enumerate(items_to_process, start=1):
-        folder_stats.setdefault(folder, {"success": 0, "failed": 0})
+    # ===== MAIN LOOP – ORIGINAL DOWNLOAD LOGIC WITH TOPIC ID =====
+    for folder, title, url in items_to_process:
         topic_id = folder_topics.get(folder) if auto_topic else None
 
-        # ---------- GENERATE FILENAMES ----------
+        # ---- Prepare name (same as original) ----
         name1 = title.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-        safe_name = sanitize_filename(name1)
         if "," in raw_text3:
-            name = f'{PRENAME}_{safe_name}'
+            name = f'{PRENAME} {name1[:60]}'
         else:
-            name = safe_name
+            name = f'{name1[:60]}'
 
-        # ---------- USER SETTINGS ----------
-        user_settings = get_user_settings(m.from_user.id, bot_username)
-        caption_style = user_settings.get("caption_style", "boxed_style")
-        if user_settings.get("auto_grouping", False):
-            group_chat_id = db.get_group_for_file(m.from_user.id, name1, bot_username)
-            if group_chat_id:
-                channel_id = group_chat_id
-                topic_id = None
-
-        # ===== URL TRANSFORMATIONS =====
+        # ---- URL transformations – copy your ENTIRE original block here ----
+        # (visionias, classx, classplus, testbook, etc.)
+        # I'm including the full block from the original code for completeness.
         Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = "https://" + Vxy
         link0 = "https://" + Vxy
@@ -1204,11 +1170,11 @@ async def txt_handler(bot: Client, m: Message):
         if "jw-prod" in url:
             cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
         elif "webvideos.classplusapp." in url:
-            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
         elif "youtube.com" in url or "youtu.be" in url:
-            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
         else:
-            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
         # Prepare captions
         current_ist = datetime.datetime.now(IST)
@@ -1216,20 +1182,14 @@ async def txt_handler(bot: Client, m: Message):
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         batch_blockquote = f'<blockquote>{b_name}</blockquote>'
 
-        # ===== DOWNLOAD/UPLOAD LOGIC =====
+        # ========== ORIGINAL DOWNLOAD/UPLOAD LOGIC (unchanged except message_thread_id) ==========
         try:
             if "drive" in url:
                 ka = await helper.download(url, name)
                 ext_actual = "pdf"
-                cc = get_video_caption(
-                    caption_style, idx, batch_blockquote, name1, 
-                    ext_actual, res, date_str, time_str, CR,
-                    topic=topic, subject=subject
-                )
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_document(chat_id=channel_id, document=ka, caption=cc, message_thread_id=topic_id)
-                processed_items += 1
-                folder_stats[folder]["success"] += 1
-                total_success += 1
+                count += 1
                 os.remove(ka)
                 continue
 
@@ -1248,38 +1208,27 @@ async def txt_handler(bot: Client, m: Message):
                                 with open(f'{name}.pdf', 'wb') as file:
                                     file.write(response.content)
                                 ext_actual = "pdf"
-                                cc = get_video_caption(
-                                    caption_style, idx, batch_blockquote, name1, 
-                                    ext_actual, res, date_str, time_str, CR,
-                                    topic=topic, subject=subject
-                                )
+                                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                                 await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_id)
-                                processed_items += 1
-                                folder_stats[folder]["success"] += 1
-                                total_success += 1
+                                count += 1
                                 os.remove(f'{name}.pdf')
                                 success = True
                                 break
                         except Exception as e:
                             await asyncio.sleep(retry_delay)
                     if not success:
+                        await m.reply_text(f"Failed to download PDF after retries.")
                         failed_count += 1
-                        folder_stats[folder]["failed"] += 1
+                        count += 1
                         continue
                 else:
-                    cmd_pdf = f'yt-dlp -o "{name}.pdf" "{url}"'
-                    download_cmd = f"{cmd_pdf} -R 25 --fragment-retries 25"
+                    cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
+                    download_cmd = f"{cmd} -R 25 --fragment-retries 25"
                     os.system(download_cmd)
                     ext_actual = "pdf"
-                    cc = get_video_caption(
-                        caption_style, idx, batch_blockquote, name1, 
-                        ext_actual, res, date_str, time_str, CR,
-                        topic=topic, subject=subject
-                    )
+                    cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                     await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, message_thread_id=topic_id)
-                    processed_items += 1
-                    folder_stats[folder]["success"] += 1
-                    total_success += 1
+                    count += 1
                     os.remove(f'{name}.pdf')
                 continue
 
@@ -1287,52 +1236,34 @@ async def txt_handler(bot: Client, m: Message):
                 await helper.pdf_download(f"{api_url}utkash-ws?url={url}&authorization={api_token}", f"{name}.html")
                 time.sleep(1)
                 ext_actual = "html"
-                cc = get_video_caption(
-                    caption_style, idx, batch_blockquote, name1, 
-                    ext_actual, res, date_str, time_str, CR,
-                    topic=topic, subject=subject
-                )
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, message_thread_id=topic_id)
                 os.remove(f'{name}.html')
-                processed_items += 1
-                folder_stats[folder]["success"] += 1
-                total_success += 1
+                count += 1
                 continue
 
             elif any(ext in url for ext in [".jpg", ".jpeg", ".png"]):
                 ext_actual = url.split('.')[-1]
-                cmd_img = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
-                os.system(cmd_img)
-                cc = get_video_caption(
-                    caption_style, idx, batch_blockquote, name1, 
-                    ext_actual, res, date_str, time_str, CR,
-                    topic=topic, subject=subject
-                )
+                cmd = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
+                os.system(cmd)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_id)
-                processed_items += 1
-                folder_stats[folder]["success"] += 1
-                total_success += 1
+                count += 1
                 os.remove(f'{name}.{ext_actual}')
                 continue
 
             elif any(ext in url for ext in [".mp3", ".wav", ".m4a"]):
                 ext_actual = url.split('.')[-1]
-                cmd_audio = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
-                os.system(cmd_audio)
-                cc = get_video_caption(
-                    caption_style, idx, batch_blockquote, name1, 
-                    ext_actual, res, date_str, time_str, CR,
-                    topic=topic, subject=subject
-                )
+                cmd = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
+                os.system(cmd)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, message_thread_id=topic_id)
-                processed_items += 1
-                folder_stats[folder]["success"] += 1
-                total_success += 1
                 os.remove(f'{name}.{ext_actual}')
+                count += 1
                 continue
 
             elif 'encrypted.m' in url:
-                Show = f"<i><b>⚡ Video APPX Encrypted Downloading</b></i>\n<blockquote><b>{str(idx).zfill(3)}) {name1}</b></blockquote>"
+                Show = f"<i><b>⚡ Video APPX Encrypted Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
                 prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
                 try:
                     res_file = await helper.download_and_decrypt_video(url, cmd, name, appxkey)
@@ -1340,70 +1271,53 @@ async def txt_handler(bot: Client, m: Message):
                     await prog.delete(True)
                     if os.path.exists(filename):
                         ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                        cc = get_video_caption(
-                            caption_style, idx, batch_blockquote, name1, 
-                            ext_actual, res, date_str, time_str, CR,
-                            topic=topic, subject=subject
-                        )
+                        cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                         await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
-                        processed_items += 1
-                        folder_stats[folder]["success"] += 1
-                        total_success += 1
+                        count += 1
                     else:
+                        await bot.send_message(channel_id, f'⚠️ Failed to decrypt.', message_thread_id=topic_id)
                         failed_count += 1
-                        folder_stats[folder]["failed"] += 1
+                        count += 1
                         continue
                 except Exception as e:
                     await bot.send_message(channel_id, f'⚠️ Error: {str(e)}', message_thread_id=topic_id)
                     failed_count += 1
-                    folder_stats[folder]["failed"] += 1
+                    count += 1
                     continue
 
             elif 'drmcdni' in url or 'drm/wv' in url:
-                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(idx).zfill(3)}) {name1}</b></blockquote>"
+                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
                 prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
                 res_file = await helper.decrypt_and_merge_video(mpd, keys_string, path, name, raw_text2)
                 filename = res_file
                 await prog.delete(True)
                 ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                cc = get_video_caption(
-                    caption_style, idx, batch_blockquote, name1, 
-                    ext_actual, res, date_str, time_str, CR,
-                    topic=topic, subject=subject
-                )
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
-                processed_items += 1
-                folder_stats[folder]["success"] += 1
-                total_success += 1
+                count += 1
                 await asyncio.sleep(1)
                 continue
 
             else:
-                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(idx).zfill(3)}) {name1}</b></blockquote>"
+                Show = f"<i><b>📥 Fast Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>"
                 prog = await bot.send_message(channel_id, Show, disable_web_page_preview=True, message_thread_id=topic_id)
                 res_file = await helper.download_video(url, cmd, name)
                 filename = res_file
                 await prog.delete(True)
                 ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                cc = get_video_caption(
-                    caption_style, idx, batch_blockquote, name1, 
-                    ext_actual, res, date_str, time_str, CR,
-                    topic=topic, subject=subject
-                )
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
-                processed_items += 1
-                folder_stats[folder]["success"] += 1
-                total_success += 1
+                count += 1
                 time.sleep(1)
 
         except Exception as e:
             await bot.send_message(channel_id, f'⚠️ Download Failed: {str(e)}', message_thread_id=topic_id)
             failed_count += 1
-            folder_stats[folder]["failed"] += 1
+            count += 1
             continue
 
     # ===== FINAL SUMMARY =====
-    success_count = total_success
+    success_count = all_links_count - failed_count
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
     summary = (
         f"-┈━═.•°✅ Completed ✅°•.═━┈-\n"
@@ -1421,9 +1335,7 @@ async def txt_handler(bot: Client, m: Message):
     else:
         await bot.send_message(channel_id, summary)
 
-# ============================================================
-# SINGLE LINK HANDLER
-# ============================================================
+# ========================= SINGLE LINK HANDLER =========================
 @bot.on_message(filters.text & filters.private)
 async def text_handler(bot: Client, m: Message):
     if m.from_user.is_bot:
@@ -1461,10 +1373,8 @@ async def text_handler(bot: Client, m: Message):
         Vxy = link.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = Vxy
         name1 = links.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-        safe_name = sanitize_filename(name1)
-        name = safe_name[:60]
+        name = f'{name1[:60]}'
 
-        # ---------- URL TRANSFORMATIONS ----------
         if "visionias" in url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
@@ -1552,13 +1462,12 @@ async def text_handler(bot: Client, m: Message):
         if "jw-prod" in url:
             cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
         elif "webvideos.classplusapp." in url:
-            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
         elif "youtube.com" in url or "youtu.be" in url:
-            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
         else:
-            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
-        # Download and send
         current_ist = datetime.datetime.now(IST)
         date_str = current_ist.strftime('%d-%m-%Y')
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
@@ -1570,11 +1479,7 @@ async def text_handler(bot: Client, m: Message):
         res_file = await helper.download_video(url, cmd, name)
         if os.path.exists(res_file):
             ext_actual = os.path.splitext(res_file)[1].lstrip('.')
-            cc = get_video_caption(
-                caption_style, count, single_batch, name1, 
-                ext_actual, res, date_str, time_str, CREDIT,
-                topic="", subject=""
-            )
+            cc = get_video_caption(caption_style, count, single_batch, name1, ext_actual, res, date_str, time_str, CREDIT, "", "")
             await helper.send_vid(bot, m, cc, res_file, thumb, name, None, channel_id, watermark=watermark)
         else:
             await m.reply_text("Download failed.")
@@ -1582,9 +1487,7 @@ async def text_handler(bot: Client, m: Message):
     except Exception as e:
         await m.reply_text(f"Error: {str(e)}")
 
-# ============================================================
-# MAIN
-# ============================================================
+# ========================= OTHER FUNCTIONS =========================
 def notify_owner():
     try:
         requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id": OWNER_ID, "text": "Bot Is Live Now 🤖"})
