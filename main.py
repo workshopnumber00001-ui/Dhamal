@@ -85,7 +85,7 @@ DEFAULT_SETTINGS = {
     "resume": False,
     "downloader_name": "🥀°𓏲кяιѕнηα⋆🌿",
     "show_extension": True,
-    "caption_style": "bracket_style",
+    "caption_style": "boxed_style",  # new default
     "show_title": True,
     "quality": "480",
     "thumbnail": "default",
@@ -96,7 +96,7 @@ DEFAULT_SETTINGS = {
     "pw_token": "your_token_here",
     "proxy": "",
     "sticker_responses": True,
-    "auto_topic": False,   # <-- new
+    "auto_topic": False,   # new
 }
 
 # Style display names mapping
@@ -120,6 +120,7 @@ STYLE_DISPLAY_NAMES = {
     "modern_border": "🏛️ Modern Border",
     "ultra_clean": "💎 Ultra Clean",
     "bracket_style": "📦 Bracket Style",
+    "boxed_style": "📦 Boxed Style",   # new
 }
 
 ALL_STYLES = list(STYLE_DISPLAY_NAMES.keys())
@@ -139,13 +140,34 @@ bot = Client(
 register_clean_handler(bot)
 
 # ========================= VIDEO CAPTION STYLES =========================
-def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR):
+def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic="", subject=""):
     """Generate video caption based on selected style"""
     
     plain_batch = re.sub(r'<[^>]+>', '', batch_blockquote).strip()
     
+    # ---------- BOXED STYLE (NEW DEFAULT) ----------
+    if style == "boxed_style":
+        if ext_actual.lower() == "pdf":
+            id_icon = "📁 FILE ID"
+        else:
+            id_icon = "🎥 VIDEO ID"
+        if ext_actual.lower() == "pdf":
+            title = f"{name1} .{ext_actual}"
+        else:
+            title = f"{name1} {res} .{ext_actual}"
+        return (
+            f"╭━━━━━━━━━━━╮\n"
+            f"{id_icon}: {str(count).zfill(3)}\n"
+            f"╰━━━━━━━━━━━╯\n\n"
+            f"📄 Title: {title}\n\n"
+            f"📖 Topic Name : {topic}\n\n"
+            f"📚 Subject Name : {subject}\n\n"
+            f"🎓 Batch Name : {plain_batch}\n\n"
+            f"📥 Downloaded by: {CR}"
+        )
+    
     # ---------- BRACKET STYLE ----------
-    if style == "bracket_style":
+    elif style == "bracket_style":
         if ext_actual.lower() == "pdf":
             file_type = "📄 FILE"
             title_suffix = " PDF"
@@ -165,8 +187,8 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
         caption += f"📥 Downloaded by: {CR}\n\n"
         caption += f"📅 {time_str}\n"
         return caption
-
-    # ---------- MINIMAL GLASS ----------
+    
+    # ---------- OTHER STYLES (kept for compatibility) ----------
     elif style == "minimal_glass":
         return (
             f"\n<b>┌───⧫ 𝐕𝐈𝐃𝐄𝐎 𝐈𝐍𝐅𝐎 ⧫───┐</b>\n"
@@ -184,7 +206,6 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"└───⧫ {time_str} ⧫───┘\n"
         )
     
-    # ---------- NEON GLOW ----------
     elif style == "neon_glow":
         return (
             f"\n<b>◤━━━━━━━━━⧫ 𝐕𝐈𝐃𝐄𝐎 ⧫━━━━━━━━━◥</b>\n\n"
@@ -197,8 +218,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"◣━━━━━━━⧫ <b>{CR}</b> ⧫━━━━━━━◢\n"
             f"<i>{time_str}</i>\n"
         )
-
-    # ---------- PREMIUM CARD ----------
+    
     elif style == "premium_card":
         return (
             f"\n<b>┏━━━━━━━━━━━━━━━━━━━━━━┓</b>\n"
@@ -217,8 +237,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>┗━━━━━━━━━━━━━━━━━━━━━━┛</b>\n"
             f"\n<i>{time_str}</i>\n"
         )
-
-    # ---------- DARK FUTURISTIC ----------
+    
     elif style == "dark_futuristic":
         return (
             f"\n<b>╔═══════════════════════╗</b>\n"
@@ -237,8 +256,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>╚═══════════════════════╝</b>\n\n"
             f"<i>⏱ {time_str}</i>\n"
         )
-
-    # ---------- CLEAN PROFESSIONAL ----------
+    
     elif style == "clean_professional":
         return (
             f"\n<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
@@ -255,8 +273,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>\n"
             f"<i>{time_str}</i>\n"
         )
-
-    # ---------- CYBER TERMINAL ----------
+    
     elif style == "cyber_terminal":
         return (
             f"\n<b>┌─[ VIDEO ]───────────────────┐</b>\n"
@@ -273,8 +290,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>└─────────────────────────────┘</b>\n"
             f"\n<i>⏱ {time_str}</i>\n"
         )
-
-    # ---------- DUAL BORDER ----------
+    
     elif style == "dual_border":
         return (
             f"\n<b>╔══════════════════════════════╗</b>\n"
@@ -294,8 +310,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>╚══════════════════════════════╝</b>\n\n"
             f"<i>🕐 {time_str}</i>\n"
         )
-
-    # ---------- ROUNDED NEON ----------
+    
     elif style == "rounded_neon":
         return (
             f"\n<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
@@ -312,8 +327,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>◈━━━━━━━━━━━━━━━━━━━━━━━━━◈</b>\n"
             f"\n<i>⏰ {time_str}</i>\n"
         )
-
-    # ---------- INSTAGRAM ----------
+    
     elif style == "instagram":
         return (
             f"\n<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n\n"
@@ -329,8 +343,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>✨✨✨✨✨✨✨✨✨✨✨✨✨</b>\n"
             f"\n<i>{time_str}</i>\n"
         )
-
-    # ---------- MATRIX ----------
+    
     elif style == "matrix":
         return (
             f"\n<b>┌─────────────────────────┐</b>\n"
@@ -352,8 +365,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>└─────────────────────────┘</b>\n"
             f"\n<i>⏱ {time_str}</i>\n"
         )
-
-    # ---------- SPACE GALAXY ----------
+    
     elif style == "space_galaxy":
         return (
             f"\n<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n"
@@ -370,8 +382,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦✧✦</b>\n\n"
             f"<i>🕐 {time_str}</i>\n"
         )
-
-    # ---------- MINIMAL DOTS ----------
+    
     elif style == "minimal_dots":
         return (
             f"\n<b>· · · · · · · · · · · · · · ·</b>\n"
@@ -388,8 +399,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>· · · · · · · · · · · · · · ·</b>\n"
             f"\n<i>{time_str}</i>\n"
         )
-
-    # ---------- CLEAN GLASS ----------
+    
     elif style == "clean_glass":
         return (
             f"\n<b>╭─────────────────────╮</b>\n"
@@ -405,8 +415,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>{time_str}</i>\n"
             f"<b>  {CR}</b>\n"
         )
-
-    # ---------- SMOOTH FLOW ----------
+    
     elif style == "smooth_flow":
         return (
             f"\n<b>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</b>\n"
@@ -422,8 +431,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>{time_str}</i>\n"
             f"<b>  ◆ {CR}</b>\n"
         )
-
-    # ---------- MINIMAL DOT ----------
+    
     elif style == "minimal_dot":
         return (
             f"\n<b>• • • • • • • • • • • • • •</b>\n"
@@ -439,8 +447,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>{time_str}</i>\n"
             f"<b>  {CR}</b>\n"
         )
-
-    # ---------- MODERN BORDER ----------
+    
     elif style == "modern_border":
         return (
             f"\n<b>┌──────────────────────┐</b>\n"
@@ -459,8 +466,7 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<b>└──────────────────────┘</b>\n"
             f"\n<i>{time_str}</i>\n"
         )
-
-    # ---------- ULTRA CLEAN ----------
+    
     elif style == "ultra_clean":
         return (
             f"\n<b>── ✦ ── ✦ ── ✦ ──</b>\n"
@@ -476,9 +482,8 @@ def get_video_caption(style, count, batch_blockquote, name1, ext_actual, res, da
             f"<i>{time_str}</i>\n"
             f"<b>  {CR}</b>\n"
         )
-
-    # ---------- DEFAULT (FALLBACK) ----------
-    else:
+    
+    else:  # default fallback
         return (
             f"\n<b>🧭 Index ID:</b> {str(count).zfill(3)}\n\n"
             f"<b>📎 Batch:</b> {plain_batch}\n\n"
@@ -515,7 +520,7 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton(f"Downloader Name: {settings['downloader_name'][:10]}", callback_data="set_downloader_name")])
     buttons.append([InlineKeyboardButton(f"Show Extension {status('show_extension')}", callback_data="set_show_extension_toggle")])
     
-    current_style = settings.get('caption_style', 'bracket_style')
+    current_style = settings.get('caption_style', 'boxed_style')
     display_name = STYLE_DISPLAY_NAMES.get(current_style, current_style)
     buttons.append([InlineKeyboardButton(f"🎨 Caption Style: {display_name}", callback_data="set_caption_style")])
     
@@ -530,7 +535,7 @@ def settings_menu_markup(user_id: int) -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton("📂 Manage Subject Groups", callback_data="set_subject_groups")])
     buttons.append([InlineKeyboardButton("Manage Database", callback_data="set_db_info")])
     buttons.append([InlineKeyboardButton(f"Sticker Responses {status('sticker_responses')}", callback_data="set_sticker_responses_toggle")])
-    buttons.append([InlineKeyboardButton(f"Auto Topic {status('auto_topic')}", callback_data="set_auto_topic_toggle")])  # <-- new
+    buttons.append([InlineKeyboardButton(f"Auto Topic {status('auto_topic')}", callback_data="set_auto_topic_toggle")])  # new
     buttons.append([InlineKeyboardButton("🔙 Back to Main Menu", callback_data="main_menu")])
     return InlineKeyboardMarkup(buttons)
 
@@ -550,13 +555,11 @@ async def settings_callback(client: Client, query: CallbackQuery):
     bot_username = client.me.username
     settings = get_user_settings(user_id, bot_username)
 
-    # ---------- TOGGLE HANDLER (generic) ----------
     if data.endswith("_toggle"):
         key = data.replace("set_", "").replace("_toggle", "")
         current = settings.get(key, False)
-        new_value = not current
-        update_setting(user_id, key, new_value, bot_username)
-        await query.answer(f"✅ {key.replace('_',' ').title()} set to {new_value}")
+        update_setting(user_id, key, not current, bot_username)
+        await query.answer(f"✅ {key.replace('_',' ').title()} set to {not current}")
         await query.message.edit_text(
             "⚙️ **Settings Menu**\n\nChoose an option to modify:",
             reply_markup=settings_menu_markup(user_id),
@@ -564,7 +567,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
         )
         return
 
-    # ---------- SET DOWNLOADER NAME ----------
     if data == "set_downloader_name":
         await query.answer()
         msg = await query.message.reply_text("✏️ Send the new name (or /cancel):", parse_mode=ParseMode.HTML)
@@ -585,7 +587,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
-    # ---------- SET CAPTION STYLE ----------
     if data == "set_caption_style":
         buttons = []
         for style in ALL_STYLES:
@@ -614,7 +615,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             )
         return
 
-    # ---------- SET QUALITY ----------
     if data == "set_quality":
         qualities = ["144", "240", "360", "480", "720", "1080"]
         buttons = []
@@ -642,7 +642,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             )
         return
 
-    # ---------- SET THUMBNAIL ----------
     if data == "set_thumbnail":
         await query.answer()
         msg = await query.message.reply_text("🖼️ Send a photo, /default, or /cancel:", parse_mode=ParseMode.HTML)
@@ -674,7 +673,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
-    # ---------- SET PW TOKEN ----------
     if data == "set_pw_token":
         await query.answer()
         msg = await query.message.reply_text("🔑 Send new PW token (or /cancel):", parse_mode=ParseMode.HTML)
@@ -694,7 +692,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
-    # ---------- SET PROXY ----------
     if data == "set_proxy":
         await query.answer()
         msg = await query.message.reply_text("🌐 Send proxy URL (or /cancel):", parse_mode=ParseMode.HTML)
@@ -714,7 +711,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
-    # ---------- DATABASE INFO ----------
     if data == "set_db_info":
         try:
             status = "✅ Connected" if db.client is not None else "❌ Disconnected"
@@ -826,7 +822,6 @@ async def settings_callback(client: Client, query: CallbackQuery):
             await msg.edit_text("⏰ Timeout.", parse_mode=ParseMode.HTML)
         return
 
-    # ---------- MAIN MENU BACK ----------
     if data == "main_menu":
         await query.message.edit_text(
             "⚙️ **Settings Menu**\n\nChoose an option:",
@@ -839,7 +834,7 @@ async def settings_callback(client: Client, query: CallbackQuery):
 
 # ========================= END SETTINGS SYSTEM =========================
 
-# ========================= OTHER COMMANDS =========================
+# ========================= OTHER COMMANDS (unchanged) =========================
 @bot.on_message(filters.command("setlog") & filters.private)
 async def set_log_channel_cmd(client: Client, message: Message):
     try:
@@ -1074,7 +1069,7 @@ async def send_logs(client: Client, m: Message):
     except Exception as e:
         await m.reply_text(f"**Error:** {e}", parse_mode=ParseMode.HTML)
 
-# ========================= MAIN DRM HANDLER (BATCH) – MODIFIED =========================
+# ========================= MAIN DRM HANDLER (MODIFIED) =========================
 @bot.on_message(filters.command(["drm"]) & auth_filter)
 async def txt_handler(bot: Client, m: Message):
     # Get bot username
@@ -1135,7 +1130,7 @@ async def txt_handler(bot: Client, m: Message):
                     folder = "General"
                 # Clean title (remove the folder tag and extra symbols)
                 title = re.sub(r'\[[^\]]+\]', '', name).strip()
-                title = re.sub(r'^[🎥📄]+\s*', '', title)  # remove emoji prefix if any
+                title = re.sub(r'^[🎥📄]+\s*', '', title)  # remove emoji prefix
                 if folder not in folders:
                     folders[folder] = []
                 folders[folder].append((title, url))
@@ -1187,7 +1182,7 @@ async def txt_handler(bot: Client, m: Message):
         await editable.edit(f"Enter number in range 1-{all_links_count}", parse_mode=ParseMode.HTML)
         return
 
-    # ===== ASK FOR BATCH INFO (same as original) =====
+    # ===== ASK FOR BATCH INFO =====
     await editable.edit("1. Enter Batch Name\n2. Send /d for default", parse_mode=ParseMode.HTML)
     try:
         input1: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1197,6 +1192,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_text0 = '/d'
     b_name = file_name.replace('_', ' ') if raw_text0 == '/d' else raw_text0
 
+    # NEW: Topic Name prompt
     await editable.edit("Enter Topic Name (or /d for default):", parse_mode=ParseMode.HTML)
     try:
         input_topic: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1206,6 +1202,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_topic = '/d'
     topic = "General" if raw_topic == '/d' else raw_topic
 
+    # NEW: Subject Name prompt
     await editable.edit("Enter Subject Name (or /d for default):", parse_mode=ParseMode.HTML)
     try:
         input_subject: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1215,6 +1212,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_subject = '/d'
     subject = "General" if raw_subject == '/d' else raw_subject
 
+    # Resolution
     await editable.edit("Enter resolution:\n144/240/360/480/720/1080", parse_mode=ParseMode.HTML)
     try:
         input2: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1228,6 +1226,7 @@ async def txt_handler(bot: Client, m: Message):
     except:
         res = "UN"
 
+    # Watermark
     await editable.edit("Send watermark text or /d for none", parse_mode=ParseMode.HTML)
     try:
         inputx: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1238,6 +1237,7 @@ async def txt_handler(bot: Client, m: Message):
     global watermark
     watermark = "/d" if raw_textx == '/d' else raw_textx
 
+    # Credit
     await editable.edit("Send credit name or /d for default", parse_mode=ParseMode.HTML)
     try:
         input3: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1252,6 +1252,7 @@ async def txt_handler(bot: Client, m: Message):
     else:
         CR = raw_text3
 
+    # PW Token
     await editable.edit("Send PW token or /d", parse_mode=ParseMode.HTML)
     try:
         input4: Message = await bot.listen(editable.chat.id, timeout=timeout_duration)
@@ -1260,6 +1261,7 @@ async def txt_handler(bot: Client, m: Message):
     except asyncio.TimeoutError:
         raw_text4 = '/d'
 
+    # Thumbnail
     await editable.edit("Send photo for thumbnail, /d for default, /skip to skip", parse_mode=ParseMode.HTML)
     thumb = "/d"
     try:
@@ -1341,17 +1343,21 @@ async def txt_handler(bot: Client, m: Message):
 
     # Get caption style once
     user_settings = get_user_settings(m.from_user.id, bot_username)
-    caption_style = user_settings.get("caption_style", "bracket_style")
+    caption_style = user_settings.get("caption_style", "boxed_style")
 
     for folder, title, url in items_to_process:
         topic_id = folder_topics.get(folder) if auto_topic else None
 
-        # ---- Prepare name (exactly as original) ----
-        name1 = title.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+        # ---- Prepare name (with sanitization) ----
+        # Remove special characters except alphanumeric, spaces, underscores, hyphens
+        safe_title = re.sub(r'[^\w\s-]', '', title)
+        safe_title = re.sub(r'[-\s]+', '_', safe_title).strip('_')
+        safe_title = safe_title[:60]
+        name1 = title  # keep original for caption
         if "," in raw_text3:
-            name = f'{PRENAME} {name1[:60]}'
+            name = f'{PRENAME}_{safe_title}'
         else:
-            name = f'{name1[:60]}'
+            name = safe_title
 
         # ---- URL transformations (copy your ENTIRE original block here) ----
         Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
@@ -1497,7 +1503,7 @@ async def txt_handler(bot: Client, m: Message):
             if "drive" in url:
                 ka = await helper.download(url, name)
                 ext_actual = "pdf"
-                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_document(chat_id=channel_id, document=ka, caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 count += 1
                 os.remove(ka)
@@ -1518,7 +1524,7 @@ async def txt_handler(bot: Client, m: Message):
                                 with open(f'{name}.pdf', 'wb') as file:
                                     file.write(response.content)
                                 ext_actual = "pdf"
-                                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                                 await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                                 count += 1
                                 os.remove(f'{name}.pdf')
@@ -1536,7 +1542,7 @@ async def txt_handler(bot: Client, m: Message):
                     download_cmd = f"{cmd} -R 25 --fragment-retries 25"
                     os.system(download_cmd)
                     ext_actual = "pdf"
-                    cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                    cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                     await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                     count += 1
                     os.remove(f'{name}.pdf')
@@ -1546,7 +1552,7 @@ async def txt_handler(bot: Client, m: Message):
                 await helper.pdf_download(f"{api_url}utkash-ws?url={url}&authorization={api_token}", f"{name}.html")
                 time.sleep(1)
                 ext_actual = "html"
-                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 os.remove(f'{name}.html')
                 count += 1
@@ -1556,7 +1562,7 @@ async def txt_handler(bot: Client, m: Message):
                 ext_actual = url.split('.')[-1]
                 cmd = f'yt-dlp -o "{name}.{ext_actual}" "{url}"'
                 os.system(cmd)
-                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_photo(chat_id=channel_id, photo=f'{name}.{ext_actual}', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 count += 1
                 os.remove(f'{name}.{ext_actual}')
@@ -1566,7 +1572,7 @@ async def txt_handler(bot: Client, m: Message):
                 ext_actual = url.split('.')[-1]
                 cmd = f'yt-dlp -x --audio-format {ext_actual} -o "{name}.{ext_actual}" "{url}"'
                 os.system(cmd)
-                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await bot.send_document(chat_id=channel_id, document=f'{name}.{ext_actual}', caption=cc, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
                 os.remove(f'{name}.{ext_actual}')
                 count += 1
@@ -1581,7 +1587,7 @@ async def txt_handler(bot: Client, m: Message):
                     await prog.delete(True)
                     if os.path.exists(filename):
                         ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                        cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                        cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                         await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
                         count += 1
                     else:
@@ -1602,7 +1608,7 @@ async def txt_handler(bot: Client, m: Message):
                 filename = res_file
                 await prog.delete(True)
                 ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
                 count += 1
                 await asyncio.sleep(1)
@@ -1615,7 +1621,7 @@ async def txt_handler(bot: Client, m: Message):
                 filename = res_file
                 await prog.delete(True)
                 ext_actual = os.path.splitext(filename)[1].lstrip('.')
-                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR)
+                cc = get_video_caption(caption_style, count, batch_blockquote, name1, ext_actual, res, date_str, time_str, CR, topic, subject)
                 await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark, topic_thread_id=topic_id)
                 count += 1
                 time.sleep(1)
@@ -1650,7 +1656,6 @@ async def txt_handler(bot: Client, m: Message):
 async def text_handler(bot: Client, m: Message):
     if m.from_user.is_bot:
         return
-    # Ignore commands
     if m.text and m.text.startswith('/'):
         return
     links = m.text
@@ -1684,9 +1689,15 @@ async def text_handler(bot: Client, m: Message):
         Vxy = link.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = Vxy
         name1 = links.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-        name = f'{name1[:60]}'
+        # sanitize for single link
+        safe_title = re.sub(r'[^\w\s-]', '', name1)
+        safe_title = re.sub(r'[-\s]+', '_', safe_title).strip('_')
+        name = safe_title[:60]
 
-        # Apply transformations (same as batch)
+        # ---- URL transformations (same as batch) ----
+        # (we'll reuse the block from above; for brevity, we'll just copy the logic)
+        # In the actual file, you can copy the entire transformation block from the batch handler.
+        # For now, we'll keep the existing transformations from the original code.
         if "visionias" in url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers={'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9', 'Accept-Language': 'en-US,en;q=0.9', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Pragma': 'no-cache', 'Referer': 'http://www.visionias.in/', 'Sec-Fetch-Dest': 'iframe', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Site': 'cross-site', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Linux; Android 12; RMX2121) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36', 'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"', 'sec-ch-ua-mobile': '?1', 'sec-ch-ua-platform': '"Android"',}) as resp:
@@ -1786,18 +1797,13 @@ async def text_handler(bot: Client, m: Message):
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         single_batch = '<blockquote>Single Video</blockquote>'
         
-        # Get user's caption style
         user_settings = get_user_settings(m.from_user.id, bot_username)
-        caption_style = user_settings.get("caption_style", "bracket_style")
+        caption_style = user_settings.get("caption_style", "boxed_style")
 
-        # Direct download using helper
         res_file = await helper.download_video(url, cmd, name)
         if os.path.exists(res_file):
             ext_actual = os.path.splitext(res_file)[1].lstrip('.')
-            cc = get_video_caption(
-                caption_style, count, single_batch, name1, 
-                ext_actual, res, date_str, time_str, CREDIT
-            )
+            cc = get_video_caption(caption_style, count, single_batch, name1, ext_actual, res, date_str, time_str, CREDIT, "", "")
             await helper.send_vid(bot, m, cc, res_file, thumb, name, None, channel_id, watermark=watermark)
         else:
             await m.reply_text("Download failed.", parse_mode=ParseMode.HTML)
