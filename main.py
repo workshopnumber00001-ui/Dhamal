@@ -1616,12 +1616,19 @@ async def txt_handler(bot: Client, m: Message):
         folder_stats.setdefault(folder, {"success": 0, "failed": 0})
         topic_id = folder_topics.get(folder) if auto_topic else None
 
-        # Prepare name
+        # ---------- SAFE FILENAME GENERATION ----------
+        # Original name1 (keep for caption)
         name1 = title.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+
+        # Sanitize for filesystem
+        safe_name = re.sub(r'[^\w\s-]', '', name1)          # remove emojis, brackets, etc.
+        safe_name = re.sub(r'[-\s]+', '_', safe_name).strip('_')  # replace spaces/hyphens with underscore
+        safe_name = safe_name[:60]                         # limit length
+
         if "," in raw_text3:
-            name = f'{PRENAME} {name1[:60]}'
+            name = f'{PRENAME}_{safe_name}'
         else:
-            name = f'{name1[:60]}'
+            name = safe_name
 
         # User settings (may override)
         user_settings = get_user_settings(m.from_user.id, bot_username)
@@ -1633,9 +1640,7 @@ async def txt_handler(bot: Client, m: Message):
                 channel_id = group_chat_id
                 topic_id = None
 
-        # ===== URL TRANSFORMATIONS (copied verbatim from original) =====
-        # The following is the full transformation block from the original txt_handler
-        # We must include it exactly as it was.
+        # ===== URL TRANSFORMATIONS =====
         Vxy = url.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = "https://" + Vxy
         link0 = "https://" + Vxy
@@ -1728,11 +1733,11 @@ async def txt_handler(bot: Client, m: Message):
         if "jw-prod" in url:
             cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
         elif "webvideos.classplusapp." in url:
-            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
         elif "youtube.com" in url or "youtu.be" in url:
-            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
         else:
-            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
 
         # Prepare captions
         current_ist = datetime.datetime.now(IST)
@@ -1740,7 +1745,7 @@ async def txt_handler(bot: Client, m: Message):
         time_str = current_ist.strftime('%A, %d %B %Y • %I:%M %p')
         batch_blockquote = f'<blockquote>{b_name}</blockquote>'
 
-        # ===== DOWNLOAD/UPLOAD LOGIC (copied verbatim from original) =====
+        # ===== DOWNLOAD/UPLOAD LOGIC =====
         try:
             if "drive" in url:
                 ka = await helper.download(url, name)
@@ -1983,7 +1988,10 @@ async def text_handler(bot: Client, m: Message):
         Vxy = link.replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
         url = Vxy
         name1 = links.replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-        name = f'{name1[:60]}'
+        # Sanitize for single link
+        safe_name = re.sub(r'[^\w\s-]', '', name1)
+        safe_name = re.sub(r'[-\s]+', '_', safe_name).strip('_')
+        name = safe_name[:60]
 
         # Apply transformations (same as batch)
         if "visionias" in url:
@@ -2073,11 +2081,11 @@ async def text_handler(bot: Client, m: Message):
         if "jw-prod" in url:
             cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
         elif "webvideos.classplusapp." in url:
-            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+            cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
         elif "youtube.com" in url or "youtu.be" in url:
-            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+            cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
         else:
-            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
+            cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.%(ext)s"'
 
         # Download and send
         current_ist = datetime.datetime.now(IST)
